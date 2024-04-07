@@ -32,6 +32,7 @@ public class SchoolManager : MonoBehaviour
                 Random.Range(-swimLimits.z, swimLimits.z));
 
             allFish[i] = Instantiate(fishPrefab, pos, Quaternion.identity);
+            allFish[i].AddComponent<TerritoryCheck>();
         }
 
         FM = this;

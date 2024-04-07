@@ -1,27 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class NestManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    List<string> objectsInTerritory;
+
+    private void Start()
     {
-        
+        objectsInTerritory = new List<string>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void addToTerritory(GameObject obj)
     {
-
+        objectsInTerritory.Append(obj.name);
     }
 
-    /// <summary>
-    /// Gets a list of objects in the territory  
-    /// </summary>
-    /// <returns></returns>
-    private GameObject objInTerritory()
+    public void removeFromTerritory(GameObject obj)
     {
-        return new GameObject();
+        objectsInTerritory.Remove(obj.name);
+    }
+
+    public List<string> getObjectsInTerritory()
+    {
+        return objectsInTerritory;
     }
 }

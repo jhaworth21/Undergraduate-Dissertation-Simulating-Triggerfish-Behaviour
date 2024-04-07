@@ -39,6 +39,7 @@ public class Triggerfish : MonoBehaviour
 
     //header for the variables related to veclocity
     [Header("Velocity")]
+    public float speed;
     public float turningSpeed;
     public float minSpeed;
     public float maxSpeed;
@@ -70,7 +71,12 @@ public class Triggerfish : MonoBehaviour
     void Update()
     {
         updateState(timeSinceLastStateChange);
-        GameObject inTerritory = nest.Obj
+        List<string> inTerritory = nest.GetComponent<NestManager>().getObjectsInTerritory();
+
+        if (inTerritory != null && state != State.Chasing)
+        {
+            state = State.Chasing;
+        }
 
         switch (state)
         {
@@ -175,8 +181,13 @@ public class Triggerfish : MonoBehaviour
         xPos =  radius * Mathf.Cos(angle);
         zPos = radius * Mathf.Sin(angle);
 
-        this.transform
+        //this.transform
         //Vector3 direction = 
+    }
+
+    private void chasingMovement()
+    {
+
     }
 
     // TODO - Implement check vision so that objects in the territory are looped over and 

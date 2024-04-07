@@ -198,6 +198,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1839271498}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1839271499}
   m_SourcePrefab: {fileID: 100100000, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
 --- !u!1 &423502218
 GameObject:
@@ -735,6 +738,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 835266264}
+  - component: {fileID: 835266265}
   m_Layer: 0
   m_Name: blue_tang_school
   m_TagString: Untagged
@@ -757,6 +761,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &835266265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835266262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14f608fbddd96604388c386257c0a466, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fishPrefab: {fileID: 919132149155446097, guid: 176babf74cab22544ab365d01043383a, type: 3}
+  numFish: 20
+  allFish: []
+  swimLimits: {x: 10, y: 10, z: 10}
+  goalPos: {x: 0, y: 0, z: 0}
+  minSpeed: 0
+  maxSpeed: 0
+  neighbourDistance: 0
+  rotationSpeed: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -772,6 +797,7 @@ GameObject:
   - component: {fileID: 963194232}
   - component: {fileID: 963194231}
   - component: {fileID: 963194230}
+  - component: {fileID: 963194233}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -938,6 +964,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   turnSpeed: 22.5
+--- !u!114 &963194233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a5effc18c0271347b1375c267c570e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1086019978
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1029,13 +1067,33 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9096525621056466016, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1086019981}
   m_SourcePrefab: {fileID: 100100000, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
 --- !u!4 &1086019979 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8464103697238931162, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
   m_PrefabInstance: {fileID: 1086019978}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1086019980 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9096525621056466016, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
+  m_PrefabInstance: {fileID: 1086019978}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1086019981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086019980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebf746f8468752c4695114e4dbfe3077, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1791780101
 GameObject:
   m_ObjectHideFlags: 0
@@ -1086,15 +1144,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27c1eb8b68762b64481130fd56746dc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chasing: 0
-  circling: 0
-  patrolling: 0
+  state: 2
   timeSinceLastStateChange: 0
   goalPos: {x: 0, y: 0, z: 0}
+  currentPos: {x: 0, y: 0, z: 0}
+  goalAdjustment: 0.3
+  stateAdjustment: 0.3
   worldFloor: {fileID: 423502218}
-  territory: {fileID: 1985945747}
+  floorBoundary: 0
+  nest: {fileID: 1086019980}
+  patrolArea: {fileID: 1985945747}
   speed: 1
   turningSpeed: 1
+  minSpeed: 0
+  maxSpeed: 2.4
+  accerlerationFactor: 0.3
+  viewRange: 15
+  viewAngle: 30
+--- !u!64 &1839271499
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1839271497}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1001 &1879184764
 PrefabInstance:
   m_ObjectHideFlags: 0
