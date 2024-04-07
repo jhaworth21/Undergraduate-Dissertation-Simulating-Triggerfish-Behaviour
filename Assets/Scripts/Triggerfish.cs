@@ -199,15 +199,27 @@ public class Triggerfish : MonoBehaviour
     {
 
     }
-    
-    // TODO - check distance of objects in the territory to see if they are within the chasing range
-    /// <summary>
-    /// Used to check if the game objects within the territory are within the vision range of the 
-    /// triggerfish model
-    /// </summary>
-    /// <param name="objects"> The objects within the territory</param>
-    private void checkDistance(GameObject[] objects)
-    {
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="objects"></param>
+    /// <param name="triggerFish"></param>
+    /// <returns></returns>
+    private GameObject getNearestObj(GameObject[] objects, GameObject triggerFish)
+    {
+        GameObject closest = null;
+        float closestDistance = 0.0f;
+
+        foreach (GameObject obj in objects)
+        {
+            float distance = Vector3.Distance(triggerFish.transform.position, obj.transform.position);
+            if(distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = obj;
+            }
+        }
+        return closest;
     }
 }
