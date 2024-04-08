@@ -178,6 +178,11 @@ public class Triggerfish : MonoBehaviour
         goalPos = new Vector3(xVal, yVal, zVal);
     }
 
+    private void updateChasingGoalPos()
+    {
+
+    }
+
 
     /// <summary>
     /// 
@@ -189,38 +194,6 @@ public class Triggerfish : MonoBehaviour
         gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation,
                                                          Quaternion.LookRotation(direction),
                                                          turningSpeed * Time.deltaTime);
-
-        this.transform.Translate(0, 0, speed * Time.deltaTime);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="nest"></param>
-    /// <param name="angle"></param>
-    private void circlingMovement(GameObject nest, float angle)
-    {
-        //definitions of the points to create the vector to rotate around
-        float xPos = this.nestMeshCollider.transform.position.x;
-        float yPos = this.transform.position.y;
-        float zPos = this.nestMeshCollider.transform.position.z;
-
-        Vector3 rotationPoint = new Vector3(xPos, yPos, zPos);
-        float radius = Vector3.Distance(this.transform.position, rotationPoint);
-
-        xPos =  radius * Mathf.Cos(angle);
-        zPos = radius * Mathf.Sin(angle);
-    }
-
-    // TODO - check to make sure this makes sense
-    private void chasingMovement(GameObject closest)
-    { 
-        goalPos = closest.transform.position;
-
-        Vector3 direction = goalPos - transform.position;
-        transform.rotation = Quaternion.Slerp(transform.rotation,
-                                                Quaternion.LookRotation(direction),
-                                                turningSpeed * Time.deltaTime);
 
         this.transform.Translate(0, 0, speed * Time.deltaTime);
     }
