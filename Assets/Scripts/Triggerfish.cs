@@ -6,6 +6,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 //TODO - Fix issue with cirlcing code not circling around a point (circles in a small circle)
+//TODO - Fix issue where inspector values aren't updating properly
 public class Triggerfish : MonoBehaviour
 {   
     //defines the possible states of the triggerfish
