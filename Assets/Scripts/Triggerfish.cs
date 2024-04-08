@@ -20,6 +20,9 @@ public class Triggerfish : MonoBehaviour
     private float timeSinceLastStateChange;
     [SerializeField]
     private Vector3 goalPos;
+    private Vector3 lastPos;
+    [SerializeField]
+    private float distanceChased;
     [SerializeField]
     private float circlingAngle;
     
@@ -61,6 +64,7 @@ public class Triggerfish : MonoBehaviour
     {
         state = State.Patrolling;
         circlingAngle = 0;
+        lastPos = Vector3.zero;
         nestMeshCollider = nest.GetComponent<MeshCollider>();
 
         //sets the lowest point that the fish can go to 
@@ -86,13 +90,15 @@ public class Triggerfish : MonoBehaviour
             closest = null;
         }
 
-        if (inTerritory != null && checkInVision(closest))
+        if (inTerritory != null && checkInVision(closest) && distanceChased <= 15)
         {
             state = State.Chasing;
             updateChasingGoalPos(closest);
         }
         else
         {
+            distanceChased = 0;
+
             if(timeSinceLastStateChange > stateAdjustment)
             {
                 float stateProbability = Random.Range(0, 1);
@@ -114,8 +120,15 @@ public class Triggerfish : MonoBehaviour
             }
         }
         movement();
+
+        if(state == State.Chasing)
+        {
+            distanceChased += Vector3.Distance(lastPos, gameObject.transform.position);
+        }
+
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
+        lastPos = gameObject.transform.position;
     }
 
     /// <summary>
@@ -176,6 +189,10 @@ public class Triggerfish : MonoBehaviour
         goalPos = new Vector3(xVal, yVal, zVal);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="closest"></param>
     private void updateChasingGoalPos(GameObject closest)
     {
         goalPos = closest.transform.position;
