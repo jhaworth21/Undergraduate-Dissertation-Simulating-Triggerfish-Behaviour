@@ -25,7 +25,7 @@ public class TerritoryCheck : MonoBehaviour
         }
         else
         {
-            if (nestManager.getObjectsInTerritory().Contains(gameObject.name))
+            if (nestManager.getObjectsInTerritory().Contains(gameObject))
             {
                 nestManager.removeFromTerritory(gameObject);
             }

@@ -6,24 +6,24 @@ using UnityEngine;
 public class NestManager : MonoBehaviour
 {
 
-    List<string> objectsInTerritory;
+    List<GameObject> objectsInTerritory;
 
     private void Start()
     {
-        objectsInTerritory = new List<string>();
+        objectsInTerritory = new List<GameObject>();
     }
 
     public void addToTerritory(GameObject obj)
     {
-        objectsInTerritory.Append(obj.name);
+        objectsInTerritory.Append(obj);
     }
 
     public void removeFromTerritory(GameObject obj)
     {
-        objectsInTerritory.Remove(obj.name);
+        objectsInTerritory.Remove(obj);
     }
 
-    public List<string> getObjectsInTerritory()
+    public List<GameObject> getObjectsInTerritory()
     {
         return objectsInTerritory;
     }

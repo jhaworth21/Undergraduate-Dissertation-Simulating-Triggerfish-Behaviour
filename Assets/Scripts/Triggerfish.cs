@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TreeEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Triggerfish : MonoBehaviour
 {   
@@ -13,16 +15,18 @@ public class Triggerfish : MonoBehaviour
     [SerializeField]
     private State state;
     [SerializeField]
+    private State lastState;
+    [SerializeField]
     private float timeSinceLastStateChange;
     [SerializeField]
     private Vector3 goalPos;
     [SerializeField]
-    private Vector3 currentPos;
+    private float circlingAngle;
     
     //header section for the tunable parameters not relating to movement
     [Header("Tunable Parameters")]
-    public float goalAdjustment = 0.3f;
-    public float stateAdjustment = 0.3f;
+    public float goalAdjustment = 1f;
+    public float stateAdjustment = 0.5f;
 
     //header for the variables relating to the territory area and movement area
     [Header("Boundaries and Territory")]
@@ -56,6 +60,7 @@ public class Triggerfish : MonoBehaviour
     void Start()
     {
         state = State.Patrolling;
+        circlingAngle = 0;
         nestMeshCollider = nest.GetComponent<MeshCollider>();
 
         //sets the lowest point that the fish can go to 
@@ -70,33 +75,49 @@ public class Triggerfish : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        updateState(timeSinceLastStateChange);
-        List<string> inTerritory = nest.GetComponent<NestManager>().getObjectsInTerritory();
+        List<GameObject> inTerritory = nest.GetComponent<NestManager>().getObjectsInTerritory();
+        GameObject closest;
+        try
+        {
+            closest = getNearestObj(inTerritory);
+        }
+        catch(NullReferenceException)
+        {
+            closest = null;
+        }
 
-        if (inTerritory != null && state != State.Chasing)
+        if (inTerritory != null && checkInVision(closest))
         {
             state = State.Chasing;
+            chasingMovement(closest);
         }
-
-        switch (state)
+        else
         {
-            case State.Patrolling:
-                patrollingMovement(goalPos);
-                break;
-            case State.Circling:
-                float rotationAngle = 0f;
-                circlingMovement(nest, rotationAngle);
-                break;
-            case State.Chasing:
-                break;
-        }
+            if(timeSinceLastStateChange > stateAdjustment)
+            {
+                float stateProbability = Random.Range(0, 1);
+                state = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
+            }
+            else if (state == State.Patrolling)
+            {
+                if (Vector3.Distance(gameObject.transform.position, goalPos) < 1)
+                {
+                    goalPos = generateGoalPos(nestMeshCollider.bounds, floorBoundary, goalPos);
+                }
+                movement();
+            }
+            else if (state == State.Circling)
+            {
+                circlingAngle  = (circlingAngle > 360) ? 0 : circlingAngle;
+                circlingAngle += (lastState == state) ? speed : 0;
 
-        if(state == State.Patrolling)
-        {
-            patrollingMovement(goalPos);
+                updateCircleGoalPos(circlingAngle, getCirclingRadius());
+                movement();
+            }
         }
 
         timeSinceLastStateChange += Time.deltaTime;
+        lastState = state;
     }
 
     /// <summary>
@@ -115,7 +136,7 @@ public class Triggerfish : MonoBehaviour
         if (previousGoal == Vector3.zero)
         {
             xVal = Random.Range(upperBound.x, lowerBound.x);
-            yVal = Random.Range(upperBound.y - 10, floorBoundary);
+            yVal = Random.Range(upperBound.y - 5, floorBoundary);
             zVal = Random.Range(upperBound.z, lowerBound.z);
         }
         else
@@ -131,36 +152,45 @@ public class Triggerfish : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="timeSinceStateChange"></param>
-    private void updateState(float timeSinceStateChange)
+    /// <param name="theta"></param>
+    /// <param name="radius"></param>
+    private void updateCircleGoalPos(float theta,  float radius)
     {
-        if(timeSinceLastStateChange < 0.3)
-        {
+        float adjustmentVal = Random.Range(0, 1);
 
+        float xVal;
+        float yVal;
+        float zVal;
+
+        if (adjustmentVal < 0.5f)
+        {
+            xVal = radius * Mathf.Cos(theta) - adjustmentVal;
+            yVal = this.transform.position.y - adjustmentVal;
+            zVal = radius * Mathf.Sin(theta) - adjustmentVal;
         }
         else
         {
-            timeSinceLastStateChange += Time.deltaTime;
+            xVal = radius * Mathf.Cos(theta) + adjustmentVal;
+            yVal = this.transform.position.y + adjustmentVal;
+            zVal = radius * Mathf.Sin(theta) + adjustmentVal;
         }
+
+        goalPos = new Vector3(xVal, yVal, zVal);
     }
+
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="goalPos"></param>
-    private void patrollingMovement(Vector3 goalPos)
+    private void movement()
     {
-        Vector3 direction = goalPos - transform.position;
-        transform.rotation = Quaternion.Slerp(transform.rotation,
-                                                Quaternion.LookRotation(direction),
-                                                turningSpeed * Time.deltaTime);
+        Vector3 direction = goalPos - gameObject.transform.position;
+        gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation,
+                                                         Quaternion.LookRotation(direction),
+                                                         turningSpeed * Time.deltaTime);
 
         this.transform.Translate(0, 0, speed * Time.deltaTime);
-
-        if (Vector3.Distance(transform.position, goalPos) < 1)
-        {
-            goalPos = generateGoalPos(nestMeshCollider.bounds, floorBoundary, goalPos);
-        }
     }
 
     /// <summary>
@@ -180,40 +210,81 @@ public class Triggerfish : MonoBehaviour
 
         xPos =  radius * Mathf.Cos(angle);
         zPos = radius * Mathf.Sin(angle);
-
-        //this.transform
-        //Vector3 direction = 
     }
 
-    private void chasingMovement()
+    // TODO - check to make sure this makes sense
+    private void chasingMovement(GameObject closest)
+    { 
+        goalPos = closest.transform.position;
+
+        Vector3 direction = goalPos - transform.position;
+        transform.rotation = Quaternion.Slerp(transform.rotation,
+                                                Quaternion.LookRotation(direction),
+                                                turningSpeed * Time.deltaTime);
+
+        this.transform.Translate(0, 0, speed * Time.deltaTime);
+    }
+
+    private float getCirclingRadius()
     {
+        //definitions of the points to create the vector to rotate around
+        float xPos = this.nestMeshCollider.transform.position.x;
+        float yPos = this.transform.position.y;
+        float zPos = this.nestMeshCollider.transform.position.z;
 
+        Vector3 rotationPoint = new Vector3(xPos, yPos, zPos);
+
+        return Vector3.Distance(this.transform.position, rotationPoint);
     }
 
-    // TODO - Implement check vision so that objects in the territory are looped over and 
+
+
     /// <summary>
-    /// 
+    ///     Checks the angle between the triggerfish and the closest object within 
+    ///     the triggerfish's territory
     /// </summary>
-    /// <param name="withinRange"></param>
-    private void checkInVision(GameObject[] withinRange)
+    /// <param name="closestObj">
+    ///     the closest object to triggerfish within the nest
+    /// </param>
+    /// <returns>
+    ///     The angle between the closest object and th
+    /// </returns>
+    private bool checkInVision(GameObject closestObj)
     {
+        if (closestObj != null)
+        {
+            float angle = Vector3.Angle(gameObject.transform.position, closestObj.transform.position);
 
+            if (angle <= 30 || angle >= 330)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return false;
     }
 
     /// <summary>
-    /// 
+    ///     Checks through a list of objects that should be parsed in from the NestManager 
+    ///     attached to the triggerfish's nest 
     /// </summary>
-    /// <param name="objects"></param>
-    /// <param name="triggerFish"></param>
-    /// <returns></returns>
-    private GameObject getNearestObj(GameObject[] objects, GameObject triggerFish)
+    /// <param name="objects">
+    ///     The list of objects to check for the nearest objects in
+    /// </param>
+    /// <returns>
+    ///     Returns the closest gameObject to the triggerfish
+    /// </returns>
+    private GameObject getNearestObj(List<GameObject> objects)
     {
         GameObject closest = null;
         float closestDistance = 0.0f;
 
         foreach (GameObject obj in objects)
         {
-            float distance = Vector3.Distance(triggerFish.transform.position, obj.transform.position);
+            float distance = Vector3.Distance(gameObject.transform.position, obj.transform.position);
             if(distance < closestDistance)
             {
                 closestDistance = distance;
