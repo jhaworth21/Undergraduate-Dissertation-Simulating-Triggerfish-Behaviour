@@ -5,6 +5,7 @@ using TreeEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+//TODO - Fix issue with cirlcing code not circling around a point (circles in a small circle)
 public class Triggerfish : MonoBehaviour
 {   
     //defines the possible states of the triggerfish
@@ -23,6 +24,8 @@ public class Triggerfish : MonoBehaviour
     private Vector3 lastPos;
     [SerializeField]
     private float distanceChased;
+    [SerializeField]
+    private GameObject currentlyChased;
     [SerializeField]
     private float circlingAngle;
     
@@ -53,7 +56,7 @@ public class Triggerfish : MonoBehaviour
     public float accerlerationFactor;
 
     //header for the variables related to vision
-    [Header("VIsion")]
+    [Header("Vision")]
     public float viewRange;
     public float viewAngle;
 
@@ -65,14 +68,17 @@ public class Triggerfish : MonoBehaviour
         state = State.Patrolling;
         circlingAngle = 0;
         lastPos = Vector3.zero;
+        currentlyChased = null;
+
         nestMeshCollider = nest.GetComponent<MeshCollider>();
+        patrolAreaCollider = patrolArea.GetComponent<MeshCollider>();
 
         //sets the lowest point that the fish can go to 
         worldFloor = GameObject.Find("Ocean Floor");
         floorBoundary = worldFloor.GetComponent<Transform>().position.y;
 
         //generates a goal 
-        goalPos = generateGoalPos(nestMeshCollider.bounds, floorBoundary, Vector3.zero);
+        goalPos = generateGoalPos(patrolAreaCollider.bounds, floorBoundary, Vector3.zero);
         timeSinceLastStateChange = 0;
     }
 
@@ -90,19 +96,18 @@ public class Triggerfish : MonoBehaviour
             closest = null;
         }
 
-        if (inTerritory != null && checkInVision(closest) && distanceChased <= 15)
+        //TODO - Check if this makes sense to switch the state into chasing
+        if (inTerritory != null && checkInVision(closest) && distanceChased <= 15 && currentlyChased == null)
         {
             state = State.Chasing;
-            updateChasingGoalPos(closest);
+            currentlyChased = closest;
         }
         else
         {
             distanceChased = 0;
-
-            if(timeSinceLastStateChange > stateAdjustment)
+            if(timeSinceLastStateChange < stateAdjustment)
             {
-                float stateProbability = Random.Range(0, 1);
-                state = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
+                updateState();
             }
             else if (state == State.Patrolling)
             {
@@ -123,12 +128,31 @@ public class Triggerfish : MonoBehaviour
 
         if(state == State.Chasing)
         {
+            updateChasingGoalPos(currentlyChased);
             distanceChased += Vector3.Distance(lastPos, gameObject.transform.position);
+
+            if (distanceChased >= 15)
+            {
+                updateState();
+            }
         }
+
+        Debug.Log("State = " + state);
 
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
         lastPos = gameObject.transform.position;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void updateState()
+    {
+        float stateProbability = Random.Range(0, 1);
+        state = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
+        currentlyChased = null;
+        timeSinceLastStateChange = 0;
     }
 
     /// <summary>
@@ -167,23 +191,21 @@ public class Triggerfish : MonoBehaviour
     /// <param name="radius"></param>
     private void updateCircleGoalPos(float theta,  float radius)
     {
-        float adjustmentVal = Random.Range(0, 1);
+        float adjustmentVal = Random.Range(0, 0.25f);
 
         float xVal;
-        float yVal;
+        float yVal = gameObject.transform.position.y;
         float zVal;
 
-        if (adjustmentVal < 0.5f)
+        if (adjustmentVal < 0.125f)
         {
-            xVal = radius * Mathf.Cos(theta) - adjustmentVal;
-            yVal = this.transform.position.y - adjustmentVal;
-            zVal = radius * Mathf.Sin(theta) - adjustmentVal;
+            xVal = (radius * Mathf.Cos(theta)) - adjustmentVal;
+            zVal = (radius * Mathf.Sin(theta)) - adjustmentVal;
         }
         else
         {
-            xVal = radius * Mathf.Cos(theta) + adjustmentVal;
-            yVal = this.transform.position.y + adjustmentVal;
-            zVal = radius * Mathf.Sin(theta) + adjustmentVal;
+            xVal = (radius * Mathf.Cos(theta)) + adjustmentVal;
+            zVal = (radius * Mathf.Sin(theta)) + adjustmentVal;
         }
 
         goalPos = new Vector3(xVal, yVal, zVal);
@@ -195,7 +217,10 @@ public class Triggerfish : MonoBehaviour
     /// <param name="closest"></param>
     private void updateChasingGoalPos(GameObject closest)
     {
-        goalPos = closest.transform.position;
+        if(gameObject.transform.position != closest.transform.position)
+        {
+            goalPos = closest.transform.position;
+        }
     }
 
 
@@ -216,13 +241,13 @@ public class Triggerfish : MonoBehaviour
     private float getCirclingRadius()
     {
         //definitions of the points to create the vector to rotate around
-        float xPos = this.nestMeshCollider.transform.position.x;
-        float yPos = this.transform.position.y;
-        float zPos = this.nestMeshCollider.transform.position.z;
+        float xPos = nestMeshCollider.transform.position.x;
+        float yPos = gameObject.transform.position.y;
+        float zPos = nestMeshCollider.transform.position.z;
 
         Vector3 rotationPoint = new Vector3(xPos, yPos, zPos);
 
-        return Vector3.Distance(this.transform.position, rotationPoint);
+        return Vector3.Distance(gameObject.transform.position, rotationPoint);
     }
 
 

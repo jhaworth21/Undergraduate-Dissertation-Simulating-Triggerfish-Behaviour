@@ -157,7 +157,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -42.97
+      value: -41.96
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1145,9 +1145,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 2
+  lastState: 0
   timeSinceLastStateChange: 0
   goalPos: {x: 0, y: 0, z: 0}
-  currentPos: {x: 0, y: 0, z: 0}
+  distanceChased: 0
+  currentlyChased: {fileID: 0}
+  circlingAngle: 0
   goalAdjustment: 0.3
   stateAdjustment: 0.3
   worldFloor: {fileID: 423502218}
@@ -1259,6 +1262,7 @@ GameObject:
   - component: {fileID: 1985945748}
   - component: {fileID: 1985945751}
   - component: {fileID: 1985945750}
+  - component: {fileID: 1985945752}
   - component: {fileID: 1985945749}
   m_Layer: 0
   m_Name: PatrolArea
@@ -1299,7 +1303,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5000001
   m_Height: 2
@@ -1354,6 +1358,28 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1985945747}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!64 &1985945752
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1985945747}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &2113921777924845047
 PrefabInstance:
