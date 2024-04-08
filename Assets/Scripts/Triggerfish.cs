@@ -89,7 +89,7 @@ public class Triggerfish : MonoBehaviour
         if (inTerritory != null && checkInVision(closest))
         {
             state = State.Chasing;
-            chasingMovement(closest);
+            updateChasingGoalPos(closest);
         }
         else
         {
@@ -104,7 +104,6 @@ public class Triggerfish : MonoBehaviour
                 {
                     goalPos = generateGoalPos(nestMeshCollider.bounds, floorBoundary, goalPos);
                 }
-                movement();
             }
             else if (state == State.Circling)
             {
@@ -112,10 +111,9 @@ public class Triggerfish : MonoBehaviour
                 circlingAngle += (lastState == state) ? speed : 0;
 
                 updateCircleGoalPos(circlingAngle, getCirclingRadius());
-                movement();
             }
         }
-
+        movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
     }
@@ -178,9 +176,9 @@ public class Triggerfish : MonoBehaviour
         goalPos = new Vector3(xVal, yVal, zVal);
     }
 
-    private void updateChasingGoalPos()
+    private void updateChasingGoalPos(GameObject closest)
     {
-
+        goalPos = closest.transform.position;
     }
 
 
