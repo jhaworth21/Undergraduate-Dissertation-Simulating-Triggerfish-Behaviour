@@ -745,7 +745,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &835266264
 Transform:
   m_ObjectHideFlags: 0
@@ -1151,8 +1151,8 @@ MonoBehaviour:
   distanceChased: 0
   currentlyChased: {fileID: 0}
   circlingAngle: 0
-  goalAdjustment: 0.3
-  stateAdjustment: 0.3
+  goalAdjustment: 1
+  stateAdjustment: 1
   worldFloor: {fileID: 423502218}
   floorBoundary: 0
   nest: {fileID: 1086019980}

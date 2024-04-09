@@ -33,7 +33,7 @@ public class Triggerfish : MonoBehaviour
     //header section for the tunable parameters not relating to movement
     [Header("Tunable Parameters")]
     public float goalAdjustment = 1f;
-    public float stateAdjustment = 0.5f;
+    public float stateAdjustment = 1f;
 
     //header for the variables relating to the territory area and movement area
     [Header("Boundaries and Territory")]
@@ -60,7 +60,6 @@ public class Triggerfish : MonoBehaviour
     [Header("Vision")]
     public float viewRange;
     public float viewAngle;
-
 
 
     // Start is called before the first frame update
@@ -98,7 +97,7 @@ public class Triggerfish : MonoBehaviour
         }
 
         //TODO - Check if this makes sense to switch the state into chasing
-        if (inTerritory != null && checkInVision(closest) && distanceChased <= 15 && currentlyChased == null)
+        if (inTerritory != null && checkInVision(closest) && currentlyChased == null)
         {
             state = State.Chasing;
             currentlyChased = closest;
@@ -106,7 +105,7 @@ public class Triggerfish : MonoBehaviour
         else
         {
             distanceChased = 0;
-            if(timeSinceLastStateChange < stateAdjustment)
+            if(timeSinceLastStateChange > stateAdjustment)
             {
                 updateState();
             }
@@ -114,7 +113,7 @@ public class Triggerfish : MonoBehaviour
             {
                 if (Vector3.Distance(gameObject.transform.position, goalPos) < 1)
                 {
-                    goalPos = generateGoalPos(nestMeshCollider.bounds, floorBoundary, goalPos);
+                    goalPos = generateGoalPos(patrolAreaCollider.bounds, floorBoundary, goalPos);
                 }
             }
             else if (state == State.Circling)
@@ -154,6 +153,7 @@ public class Triggerfish : MonoBehaviour
         state = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
         currentlyChased = null;
         timeSinceLastStateChange = 0;
+        Debug.Log("reset time since last change");
     }
 
     /// <summary>
@@ -169,7 +169,7 @@ public class Triggerfish : MonoBehaviour
         float yVal;
         float zVal;
 
-        if (previousGoal == Vector3.zero)
+        if (previousGoal == Vector3.zero || !patrolAreaCollider.bounds.Contains(goalPos))
         {
             xVal = Random.Range(upperBound.x, lowerBound.x);
             yVal = Random.Range(upperBound.y - 5, floorBoundary);
@@ -200,13 +200,13 @@ public class Triggerfish : MonoBehaviour
 
         if (adjustmentVal < 0.125f)
         {
-            xVal = (radius * Mathf.Cos(theta)) - adjustmentVal;
-            zVal = (radius * Mathf.Sin(theta)) - adjustmentVal;
+            xVal = nest.transform.position.x + (radius * Mathf.Cos(theta)) - adjustmentVal;
+            zVal = nest.transform.position.z + (radius * Mathf.Sin(theta)) - adjustmentVal;
         }
         else
         {
-            xVal = (radius * Mathf.Cos(theta)) + adjustmentVal;
-            zVal = (radius * Mathf.Sin(theta)) + adjustmentVal;
+            xVal = nest.transform.position.x + (radius * Mathf.Cos(theta)) + adjustmentVal;
+            zVal = nest.transform.position.z + (radius * Mathf.Sin(theta)) + adjustmentVal;
         }
 
         goalPos = new Vector3(xVal, yVal, zVal);
