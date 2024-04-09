@@ -33,7 +33,7 @@ public class Triggerfish : MonoBehaviour
     //header section for the tunable parameters not relating to movement
     [Header("Tunable Parameters")]
     public float goalAdjustment = 1f;
-    public float stateAdjustment = 1f;
+    public float stateAdjustment = 5f;
 
     //header for the variables relating to the territory area and movement area
     [Header("Boundaries and Territory")]
@@ -119,13 +119,11 @@ public class Triggerfish : MonoBehaviour
             else if (state == State.Circling)
             {
                 circlingAngle  = (circlingAngle > 360) ? 0 : circlingAngle;
-                circlingAngle += (lastState == state) ? speed : 0;
+                circlingAngle += (lastState == state) ? speed * Time.deltaTime : 0;
 
-                updateCircleGoalPos(circlingAngle, getCirclingRadius());
+                updateCircleGoalPos(circlingAngle, 2* getCirclingRadius());
             }
         }
-        movement();
-
         if(state == State.Chasing)
         {
             updateChasingGoalPos(currentlyChased);
@@ -136,9 +134,7 @@ public class Triggerfish : MonoBehaviour
                 updateState();
             }
         }
-
-        Debug.Log("State = " + state);
-
+        movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
         lastPos = gameObject.transform.position;
@@ -149,11 +145,12 @@ public class Triggerfish : MonoBehaviour
     /// </summary>
     private void updateState()
     {
-        float stateProbability = Random.Range(0, 1);
+        float stateProbability = Random.Range(0, 1f);
         state = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
+        Debug.Log("State = " + state);
+        Debug.Log("State Prob = " + stateProbability);
         currentlyChased = null;
         timeSinceLastStateChange = 0;
-        Debug.Log("reset time since last change");
     }
 
     /// <summary>
@@ -200,13 +197,13 @@ public class Triggerfish : MonoBehaviour
 
         if (adjustmentVal < 0.125f)
         {
-            xVal = nest.transform.position.x + (radius * Mathf.Cos(theta)) - adjustmentVal;
-            zVal = nest.transform.position.z + (radius * Mathf.Sin(theta)) - adjustmentVal;
+            xVal = nest.transform.position.x + (radius * Mathf.Cos(theta));
+            zVal = nest.transform.position.z + (radius * Mathf.Sin(theta));
         }
         else
         {
-            xVal = nest.transform.position.x + (radius * Mathf.Cos(theta)) + adjustmentVal;
-            zVal = nest.transform.position.z + (radius * Mathf.Sin(theta)) + adjustmentVal;
+            xVal = nest.transform.position.x + (radius * Mathf.Cos(theta));
+            zVal = nest.transform.position.z + (radius * Mathf.Sin(theta));
         }
 
         goalPos = new Vector3(xVal, yVal, zVal);
@@ -242,9 +239,9 @@ public class Triggerfish : MonoBehaviour
     private float getCirclingRadius()
     {
         //definitions of the points to create the vector to rotate around
-        float xPos = nestMeshCollider.transform.position.x;
+        float xPos = nest.transform.position.x;
         float yPos = gameObject.transform.position.y;
-        float zPos = nestMeshCollider.transform.position.z;
+        float zPos = nest.transform.position.z;
 
         Vector3 rotationPoint = new Vector3(xPos, yPos, zPos);
 
