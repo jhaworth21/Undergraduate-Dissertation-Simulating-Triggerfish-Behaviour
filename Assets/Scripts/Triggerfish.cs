@@ -90,18 +90,20 @@ public class Triggerfish : MonoBehaviour
     void Update()
     {
         inTerritory = nestManager.getObjectsInTerritory();
-        foreach(GameObject objects in inTerritory)
-        {
-            Debug.Log("In check loop");
-            Debug.Log("Game object = " + objects.name);
-        }
+        //foreach(GameObject objects in inTerritory)
+        //{
+        //    Debug.Log("In check loop");
+        //    Debug.Log("Game object = " + objects.name);
+        //}
         try
         {
             closest = getNearestObj(inTerritory);
+            Debug.Log(closest.name);
         }
         catch(NullReferenceException)
         {
             closest = null;
+            Debug.Log("closest is null");
         }
 
         //TODO - Check if this makes sense to switch the state into chasing
@@ -305,7 +307,7 @@ public class Triggerfish : MonoBehaviour
         foreach (GameObject obj in objects)
         {
             float distance = Vector3.Distance(gameObject.transform.position, obj.transform.position);
-            if(distance < closestDistance)
+            if(distance < closestDistance || closest == null)
             {
                 closestDistance = distance;
                 closest = obj;
