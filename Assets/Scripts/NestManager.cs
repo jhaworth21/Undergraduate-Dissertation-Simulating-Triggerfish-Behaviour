@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+//TODO - Fix issue to do with the objectsInTerritory being empty - either in this or triggerfish
+// not sure yet
+
 public class NestManager : MonoBehaviour
 {
 
     List<GameObject> objectsInTerritory;
 
-    private void Start()
+    void Start()
     {
         objectsInTerritory = new List<GameObject>();
     }
@@ -25,6 +28,10 @@ public class NestManager : MonoBehaviour
 
     public List<GameObject> getObjectsInTerritory()
     {
+        foreach (GameObject objects in objectsInTerritory)
+        {
+            Debug.Log("Game object = " + objects.name);
+        }
         return objectsInTerritory;
     }
 }

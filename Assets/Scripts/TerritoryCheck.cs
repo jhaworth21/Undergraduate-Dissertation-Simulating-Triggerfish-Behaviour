@@ -19,7 +19,7 @@ public class TerritoryCheck : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (checkInNest(gameObject))
+        if (checkInNest() && !nestManager.getObjectsInTerritory().Contains(gameObject))
         {
             nestManager.addToTerritory(gameObject);
         }
@@ -32,9 +32,10 @@ public class TerritoryCheck : MonoBehaviour
         }
     }
 
-    private bool checkInNest(GameObject obj)
+    private bool checkInNest()
     {
-        if (nestCollidder.bounds.Contains(obj.transform.position)){
+        if (nestCollidder.bounds.Contains(gameObject.transform.position)){
+            //Debug.Log("in bounds");
             return true;
         }
         else 

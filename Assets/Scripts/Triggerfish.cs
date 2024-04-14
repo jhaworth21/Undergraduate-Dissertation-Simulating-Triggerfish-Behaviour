@@ -1,12 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-//TODO - Fix issue with cirlcing code not circling around a point (circles in a small circle)
-//TODO - Fix issue where inspector values aren't updating properly
+
+//TODO - Check program flow under different conditions - maybe last chased object??
 public class Triggerfish : MonoBehaviour
 {   
     //defines the possible states of the triggerfish
@@ -41,9 +40,12 @@ public class Triggerfish : MonoBehaviour
     public GameObject worldFloor;
     [SerializeField]
     private float floorBoundary;
+    private NestManager nestManager;
 
     //variables for the nest and patrol areas (and mesh colliders)
     public GameObject nest;
+    private GameObject closest;
+    private List<GameObject> inTerritory;
     private MeshCollider nestMeshCollider;
     public GameObject patrolArea;
     private MeshCollider patrolAreaCollider;
@@ -72,6 +74,8 @@ public class Triggerfish : MonoBehaviour
 
         nestMeshCollider = nest.GetComponent<MeshCollider>();
         patrolAreaCollider = patrolArea.GetComponent<MeshCollider>();
+        nestManager = nest.GetComponent<NestManager>();
+
 
         //sets the lowest point that the fish can go to 
         worldFloor = GameObject.Find("Ocean Floor");
@@ -85,8 +89,11 @@ public class Triggerfish : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        List<GameObject> inTerritory = nest.GetComponent<NestManager>().getObjectsInTerritory();
-        GameObject closest;
+        inTerritory = nestManager.getObjectsInTerritory();
+        foreach(GameObject objects in inTerritory)
+        {
+            Debug.Log("Game object = " + objects.name);
+        }
         try
         {
             closest = getNearestObj(inTerritory);
@@ -97,14 +104,15 @@ public class Triggerfish : MonoBehaviour
         }
 
         //TODO - Check if this makes sense to switch the state into chasing
-        if (inTerritory != null && checkInVision(closest) && currentlyChased == null)
+        if (inTerritory.Count != 0 && checkInVision(closest) && currentlyChased == null)
         {
             state = State.Chasing;
             currentlyChased = closest;
         }
-        else
+        else if (state != State.Chasing) 
         {
             distanceChased = 0;
+            currentlyChased = null;
             if(timeSinceLastStateChange > stateAdjustment)
             {
                 updateState();
@@ -147,9 +155,8 @@ public class Triggerfish : MonoBehaviour
     {
         float stateProbability = Random.Range(0, 1f);
         state = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
-        Debug.Log("State = " + state);
-        Debug.Log("State Prob = " + stateProbability);
-        currentlyChased = null;
+        //Debug.Log("State = " + state);
+        //Debug.Log("State Prob = " + stateProbability);
         timeSinceLastStateChange = 0;
     }
 
@@ -265,6 +272,7 @@ public class Triggerfish : MonoBehaviour
         if (closestObj != null)
         {
             float angle = Vector3.Angle(gameObject.transform.position, closestObj.transform.position);
+            Debug.Log("Angle = " + angle);
 
             if (angle <= 30 || angle >= 330)
             {
