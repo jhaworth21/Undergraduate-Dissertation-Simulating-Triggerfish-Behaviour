@@ -57,6 +57,7 @@ public class Triggerfish : MonoBehaviour
     public float minSpeed;
     public float maxSpeed;
     public float accerlerationFactor;
+    public float passiveLimiter;
 
     //header for the variables related to vision
     [Header("Vision")]
@@ -233,8 +234,15 @@ public class Triggerfish : MonoBehaviour
         gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation,
                                                          Quaternion.LookRotation(direction),
                                                          turningSpeed * Time.deltaTime);
+        if (state != State.Chasing)
+        {
+            this.transform.Translate(0, 0, passiveLimiter * speed * Time.deltaTime)
+        }
+        else 
+        {
+            this.transform.Translate(0, 0, speed * Time.deltaTime);
+        }
 
-        this.transform.Translate(0, 0, speed * Time.deltaTime);
     }
 
     private float getCirclingRadius()
