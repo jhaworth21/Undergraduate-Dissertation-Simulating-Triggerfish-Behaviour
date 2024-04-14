@@ -21,7 +21,7 @@ public class Triggerfish : MonoBehaviour
     private float timeSinceLastStateChange;
     [SerializeField]
     private Vector3 goalPos;
-    private Vector3 lastPos;
+    private Vector3 startChasePos;
     [SerializeField]
     private float distanceChased;
     [SerializeField]
@@ -69,7 +69,6 @@ public class Triggerfish : MonoBehaviour
     {
         state = State.Patrolling;
         circlingAngle = 0;
-        lastPos = Vector3.zero;
         currentlyChased = null;
 
         nestMeshCollider = nest.GetComponent<MeshCollider>();
@@ -90,20 +89,13 @@ public class Triggerfish : MonoBehaviour
     void Update()
     {
         inTerritory = nestManager.getObjectsInTerritory();
-        //foreach(GameObject objects in inTerritory)
-        //{
-        //    Debug.Log("In check loop");
-        //    Debug.Log("Game object = " + objects.name);
-        //}
         try
         {
             closest = getNearestObj(inTerritory);
-            Debug.Log(closest.name);
         }
         catch(NullReferenceException)
         {
             closest = null;
-            Debug.Log("closest is null");
         }
 
         //TODO - Check if this makes sense to switch the state into chasing
@@ -111,6 +103,7 @@ public class Triggerfish : MonoBehaviour
         {
             state = State.Chasing;
             currentlyChased = closest;
+            startChasePos = gameObject.transform.position;
         }
         else if (state != State.Chasing) 
         {
@@ -137,8 +130,9 @@ public class Triggerfish : MonoBehaviour
         }
         if(state == State.Chasing)
         {
+            distanceChased = Vector3.Distance(startChasePos, gameObject.transform.position);
             updateChasingGoalPos(currentlyChased);
-            distanceChased += Vector3.Distance(lastPos, gameObject.transform.position);
+            Debug.Log("Distance chased = " + distanceChased);
 
             if (distanceChased >= 15)
             {
@@ -148,7 +142,6 @@ public class Triggerfish : MonoBehaviour
         movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
-        lastPos = gameObject.transform.position;
     }
 
     /// <summary>
@@ -158,8 +151,6 @@ public class Triggerfish : MonoBehaviour
     {
         float stateProbability = Random.Range(0, 1f);
         state = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
-        //Debug.Log("State = " + state);
-        //Debug.Log("State Prob = " + stateProbability);
         timeSinceLastStateChange = 0;
     }
 
@@ -275,8 +266,6 @@ public class Triggerfish : MonoBehaviour
         if (closestObj != null)
         {
             float angle = Vector3.Angle(gameObject.transform.position, closestObj.transform.position);
-            Debug.Log("Angle = " + angle);
-
             if (angle <= 30 || angle >= 330)
             {
                 return true;
