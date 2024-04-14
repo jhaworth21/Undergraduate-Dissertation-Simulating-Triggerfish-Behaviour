@@ -92,6 +92,7 @@ public class Triggerfish : MonoBehaviour
         inTerritory = nestManager.getObjectsInTerritory();
         foreach(GameObject objects in inTerritory)
         {
+            Debug.Log("In check loop");
             Debug.Log("Game object = " + objects.name);
         }
         try

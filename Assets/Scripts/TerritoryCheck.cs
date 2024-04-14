@@ -23,19 +23,15 @@ public class TerritoryCheck : MonoBehaviour
         {
             nestManager.addToTerritory(gameObject);
         }
-        else
+        else if (!checkInNest() && nestManager.getObjectsInTerritory().Contains(gameObject))
         {
-            if (nestManager.getObjectsInTerritory().Contains(gameObject))
-            {
-                nestManager.removeFromTerritory(gameObject);
-            }
+            nestManager.removeFromTerritory(gameObject);
         }
     }
 
     private bool checkInNest()
     {
         if (nestCollidder.bounds.Contains(gameObject.transform.position)){
-            //Debug.Log("in bounds");
             return true;
         }
         else 

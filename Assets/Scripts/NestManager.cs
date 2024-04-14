@@ -18,7 +18,7 @@ public class NestManager : MonoBehaviour
 
     public void addToTerritory(GameObject obj)
     {
-        objectsInTerritory.Append(obj);
+        objectsInTerritory.Add(obj);
     }
 
     public void removeFromTerritory(GameObject obj)
@@ -28,10 +28,6 @@ public class NestManager : MonoBehaviour
 
     public List<GameObject> getObjectsInTerritory()
     {
-        foreach (GameObject objects in objectsInTerritory)
-        {
-            Debug.Log("Game object = " + objects.name);
-        }
         return objectsInTerritory;
     }
 }
