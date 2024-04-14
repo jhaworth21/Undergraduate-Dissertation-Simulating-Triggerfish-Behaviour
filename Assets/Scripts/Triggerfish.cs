@@ -236,7 +236,7 @@ public class Triggerfish : MonoBehaviour
                                                          turningSpeed * Time.deltaTime);
         if (state != State.Chasing)
         {
-            this.transform.Translate(0, 0, passiveLimiter * speed * Time.deltaTime)
+            this.transform.Translate(0, 0, passiveLimiter * speed * Time.deltaTime);
         }
         else 
         {
