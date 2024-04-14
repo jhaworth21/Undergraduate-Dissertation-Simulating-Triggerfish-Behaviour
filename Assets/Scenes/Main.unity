@@ -3155,6 +3155,7 @@ MonoBehaviour:
   minSpeed: 0
   maxSpeed: 2.4
   accerlerationFactor: 0.3
+  passiveLimiter: 0.75
   viewRange: 15
   viewAngle: 30
 --- !u!64 &1839271499

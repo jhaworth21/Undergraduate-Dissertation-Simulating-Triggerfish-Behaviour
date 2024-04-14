@@ -5,7 +5,11 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 
-//TODO - Check program flow under different conditions - maybe last chased object??
+//TODO - Comment code
+//TODO - get accerlation working properly
+//TODO - check for redundant variables
+//TODO - check if triggerfish chases object further than 15m
+
 public class Triggerfish : MonoBehaviour
 {   
     //defines the possible states of the triggerfish
@@ -99,7 +103,6 @@ public class Triggerfish : MonoBehaviour
             closest = null;
         }
 
-        //TODO - Check if this makes sense to switch the state into chasing
         if (inTerritory.Count != 0 && checkInVision(closest) && currentlyChased == null)
         {
             state = State.Chasing;
@@ -131,11 +134,16 @@ public class Triggerfish : MonoBehaviour
         }
         if(state == State.Chasing)
         {
-            distanceChased = Vector3.Distance(startChasePos, gameObject.transform.position);
+            distanceChased = Vector3.Distance(new Vector3(
+                                                        nest.transform.position.x, 
+                                                        gameObject.transform.position.y, 
+                                                        nest.transform.position.z),
+                                              gameObject.transform.position);
+
             updateChasingGoalPos(currentlyChased);
             Debug.Log("Distance chased = " + distanceChased);
 
-            if (distanceChased >= 15)
+            if (distanceChased > 15 || goalPos == gameObject.transform.position)
             {
                 updateState();
             }
@@ -236,10 +244,12 @@ public class Triggerfish : MonoBehaviour
                                                          turningSpeed * Time.deltaTime);
         if (state != State.Chasing)
         {
+            speed = (speed > passiveLimiter * maxSpeed) ? speed - (speed * accerlerationFactor) : speed;
             this.transform.Translate(0, 0, passiveLimiter * speed * Time.deltaTime);
         }
         else 
         {
+            speed = (speed > maxSpeed) ? speed - (speed * accerlerationFactor) : speed;
             this.transform.Translate(0, 0, speed * Time.deltaTime);
         }
 
