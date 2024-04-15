@@ -6,14 +6,15 @@ using Random = UnityEngine.Random;
 
 
 //TODO - Comment code
-//TODO - get accerlation working properly
 //TODO - check for redundant variables
-//TODO - check if triggerfish chases object further than 15m
+//TODO - Add check to see if fish is in patrol area and then adjust goalPos accordingly
+//TODO - change so that it rotates around a specific point (ie the territory)
+
 
 public class Triggerfish : MonoBehaviour
 {   
     //defines the possible states of the triggerfish
-    private enum State { Chasing, Circling, Patrolling };
+    private enum State { Chasing, Circling, Patrolling, Returning };
 
     //header section for the variables relating to the current state
     [Header("State Variables")]
@@ -60,7 +61,7 @@ public class Triggerfish : MonoBehaviour
     public float turningSpeed;
     public float minSpeed;
     public float maxSpeed;
-    public float accerlerationFactor;
+    public float accelerationFactor;
     public float passiveLimiter;
 
     //header for the variables related to vision
@@ -113,7 +114,12 @@ public class Triggerfish : MonoBehaviour
         {
             distanceChased = 0;
             currentlyChased = null;
-            if(timeSinceLastStateChange > stateAdjustment)
+            if(!patrolAreaCollider.bounds.Contains(gameObject.transform.position))
+            {
+                state = State.Returning;
+                goalPos = generateGoalPos(patrolAreaCollider.bounds, floorBoundary, goalPos);
+            }
+            else if(timeSinceLastStateChange > stateAdjustment)
             {
                 updateState();
             }
@@ -141,8 +147,6 @@ public class Triggerfish : MonoBehaviour
                                               gameObject.transform.position);
 
             updateChasingGoalPos(currentlyChased);
-            Debug.Log("Distance chased = " + distanceChased);
-
             if (distanceChased > 15 || goalPos == gameObject.transform.position)
             {
                 updateState();
@@ -244,15 +248,16 @@ public class Triggerfish : MonoBehaviour
                                                          turningSpeed * Time.deltaTime);
         if (state != State.Chasing)
         {
-            speed = (speed > passiveLimiter * maxSpeed) ? speed - (speed * accerlerationFactor) : speed;
+            speed = (speed >= passiveLimiter * maxSpeed) ? speed - (speed * accelerationFactor) : speed;
+            speed = (speed < passiveLimiter * maxSpeed) ? speed + (speed * accelerationFactor) : speed;
             this.transform.Translate(0, 0, passiveLimiter * speed * Time.deltaTime);
         }
         else 
         {
-            speed = (speed > maxSpeed) ? speed - (speed * accerlerationFactor) : speed;
+            speed = (speed >= maxSpeed) ? speed - (speed * accelerationFactor) : speed;
+            speed = (speed < maxSpeed) ? speed + (speed * accelerationFactor) : speed;
             this.transform.Translate(0, 0, speed * Time.deltaTime);
         }
-
     }
 
     private float getCirclingRadius()
@@ -284,6 +289,7 @@ public class Triggerfish : MonoBehaviour
         if (closestObj != null)
         {
             float angle = Vector3.Angle(gameObject.transform.position, closestObj.transform.position);
+            Debug.Log("Angle between fish and closest = " + angle);
             if (angle <= 30 || angle >= 330)
             {
                 return true;
