@@ -7,8 +7,8 @@ using Random = UnityEngine.Random;
 
 //TODO - Comment code
 //TODO - check for redundant variables
-//TODO - Add check to see if fish is in patrol area and then adjust goalPos accordingly
 //TODO - change so that it rotates around a specific point (ie the territory)
+//TODO - fix vision angles
 
 
 public class Triggerfish : MonoBehaviour
@@ -288,9 +288,9 @@ public class Triggerfish : MonoBehaviour
     {
         if (closestObj != null)
         {
-            float angle = Vector3.Angle(gameObject.transform.position, closestObj.transform.position);
+            float angle = Vector3.Angle(gameObject.transform.forward, closestObj.transform.position);
             Debug.Log("Angle between fish and closest = " + angle);
-            if (angle <= 30 || angle >= 330)
+            if (angle <= 30)
             {
                 return true;
             }
