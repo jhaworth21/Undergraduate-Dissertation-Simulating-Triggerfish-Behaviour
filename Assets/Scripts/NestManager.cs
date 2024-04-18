@@ -16,6 +16,20 @@ public class NestManager : MonoBehaviour
         objectsInTerritory = new List<GameObject>();
     }
 
+    private void Update()
+    {
+        if(objectsInTerritory.Count > 0)
+        {
+            foreach (GameObject go in objectsInTerritory)
+            {
+                if (!go.activeInHierarchy)
+                {
+                    objectsInTerritory.Remove(go);
+                }
+            }
+        }
+    }
+
     public void addToTerritory(GameObject obj)
     {
         objectsInTerritory.Add(obj);

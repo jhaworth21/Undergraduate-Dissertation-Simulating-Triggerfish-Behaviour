@@ -32,6 +32,7 @@ public class SchoolManager : MonoBehaviour
 
             allFish[i] = Instantiate(fishPrefab, pos, Quaternion.identity);
             allFish[i].AddComponent<TerritoryCheck>();
+            allFish[i].AddComponent<School>();
         }
 
         FM = this;
