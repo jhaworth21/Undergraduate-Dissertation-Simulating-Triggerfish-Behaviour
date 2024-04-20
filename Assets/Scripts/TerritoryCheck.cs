@@ -19,13 +19,13 @@ public class TerritoryCheck : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (checkInNest() && !nestManager.getObjectsInTerritory().Contains(gameObject))
+        if (checkInNest() && !nestManager.getObjectsInNest().Contains(gameObject))
         {
-            nestManager.addToTerritory(gameObject);
+            nestManager.addToNest(gameObject);
         }
-        else if (!checkInNest() && nestManager.getObjectsInTerritory().Contains(gameObject))
+        else if (!checkInNest() && nestManager.getObjectsInNest().Contains(gameObject))
         {
-            nestManager.removeFromTerritory(gameObject);
+            nestManager.removeFromNest(gameObject);
         }
     }
 

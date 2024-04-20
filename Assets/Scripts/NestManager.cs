@@ -3,45 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-//TODO - Fix issue to do with the objectsInTerritory being empty - either in this or triggerfish
-// not sure yet
-
 public class NestManager : MonoBehaviour
 {
 
-    List<GameObject> objectsInTerritory;
+    List<GameObject> objectsInNest;
 
     void Start()
     {
-        objectsInTerritory = new List<GameObject>();
+        objectsInNest = new List<GameObject>();
     }
 
     private void Update()
     {
-        if(objectsInTerritory.Count > 0)
+        if(objectsInNest.Count > 0)
         {
-            foreach (GameObject go in objectsInTerritory)
+            foreach (GameObject go in objectsInNest)
             {
                 if (!go.activeInHierarchy)
                 {
-                    objectsInTerritory.Remove(go);
+                    objectsInNest.Remove(go);
                 }
             }
         }
     }
 
-    public void addToTerritory(GameObject obj)
+    public void addToNest(GameObject obj)
     {
-        objectsInTerritory.Add(obj);
+        objectsInNest.Add(obj);
     }
 
-    public void removeFromTerritory(GameObject obj)
+    public void removeFromNest(GameObject obj)
     {
-        objectsInTerritory.Remove(obj);
+        objectsInNest.Remove(obj);
     }
 
-    public List<GameObject> getObjectsInTerritory()
+    public List<GameObject> getObjectsInNest()
     {
-        return objectsInTerritory;
+        return objectsInNest;
     }
 }

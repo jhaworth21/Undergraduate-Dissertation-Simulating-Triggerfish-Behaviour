@@ -49,7 +49,7 @@ public class Triggerfish : MonoBehaviour
     public GameObject nest;
     private MeshCollider nestMeshCollider;
     private GameObject closest;
-    private List<GameObject> inTerritory;
+    private List<GameObject> inNest;
     public GameObject patrolArea;
     private MeshCollider patrolAreaCollider;
 
@@ -71,10 +71,12 @@ public class Triggerfish : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //setup of initial parameters
         state = updateState();
         circlingAngle = 0;
         currentlyChased = null;
-
+        
+        //initialisation of the territory components
         nestMeshCollider = nest.GetComponent<MeshCollider>();
         patrolAreaCollider = patrolArea.GetComponent<MeshCollider>();
         nestManager = nest.GetComponent<NestManager>();
@@ -84,105 +86,151 @@ public class Triggerfish : MonoBehaviour
         worldFloor = GameObject.Find("Ocean Floor");
         floorBoundary = worldFloor.GetComponent<Transform>().position.y;
 
+        //inital value of the time since last state change
         timeSinceLastStateChange = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        inTerritory = nestManager.getObjectsInTerritory();
-        closest = getNearestObj(inTerritory);
 
-        if (inTerritory.Count != 0 && checkInVision(closest) && currentlyChased == null)
+        //gets the objects in nest and the nearest of these
+        inNest = nestManager.getObjectsInNest();
+        closest = getNearestObj(inNest);
+
+        //if the chasing conditions are met
+        if (inNest.Count != 0 && checkInVision(closest)) //&& currentlyChased == null)
         {
+            //set state to chasing and set currently chased to closest
             state = State.Chasing;
             currentlyChased = closest;
         }
+
+        //if state isn't in chasing (ie passive state)
         else if (state != State.Chasing) 
         {
+            //resets the distance chased and currently chased - not in chasing any more
             distanceChased = 0;
             currentlyChased = null;
+
+            //checks if triggerfish is within 
             if(!patrolAreaCollider.bounds.Contains(gameObject.transform.position))
             {
+                //sets state to returning
                 state = State.Returning;
+                //generates new goal position back in the patrol area
                 goalPos = generateGoalPos(patrolAreaCollider.bounds, floorBoundary, goalPos);
             }
+
+            //TODO - adjust so that higher probability not just given threshold
             if(timeSinceLastStateChange > stateAdjustment || 
                 (patrolAreaCollider.bounds.Contains(gameObject.transform.position) && lastState == State.Returning))
             {
+                //updates the state to randomly be circling or patrolling
                 state = updateState();
             }
+
+            //checks if fish is patrolling
             if (state == State.Patrolling)
             {
+                //if fish is near the goal position or was previously in a different state, adjust goal position
                 if (Vector3.Distance(gameObject.transform.position, goalPos) < 1 || lastState != State.Patrolling)
                 {
                     goalPos = generateGoalPos(patrolAreaCollider.bounds, floorBoundary, goalPos);
                 }
             }
+
+            //checks if fish is cirlcing
             if (state == State.Circling)
             {
+                //if not previously circling, sets the radius of the circular path
                 if (lastState != State.Circling)
                 {
                     circlingRadius = Mathf.Abs(getCirclingRadius());
                 }
-                //circlingAngle  = (circlingAngle > 360) ? 0 : circlingAngle;
+                //updates the cureent angle based on the current speed and adjusts this to the time change
                 circlingAngle += (lastState == state) ? speed * Time.deltaTime : 0;
                 goalPos = updateCircleGoalPos(circlingAngle, circlingRadius);
             }
         }
+
+        //checks if state is chasing
         if(state == State.Chasing)
         {
-            if (distanceChased > 15 || goalPos == gameObject.transform.position || !currentlyChased.activeInHierarchy)
+            //if chased for 15m, has reached the position or chased object is deleted
+            float distnceFromChased = Vector3.Distance(gameObject.transform.position, goalPos);
+            if (distanceChased > 15 || 
+                distanceChased <= gameObject.GetComponent<MeshRenderer>().bounds.extents.z || 
+                !currentlyChased.activeInHierarchy)
             {
+                //updates the state to a passive state
                 state = updateState();
             }
+            //updates the distance chased (from center of nest)
             distanceChased = Vector3.Distance(new Vector3(
-                                                        nest.transform.position.x, 
-                                                        gameObject.transform.position.y, 
-                                                        nest.transform.position.z),
+                                                          nest.transform.position.x, 
+                                                          gameObject.transform.position.y, 
+                                                          nest.transform.position.z),
                                               gameObject.transform.position);
 
-            updateChasingGoalPos(currentlyChased);
+            //updates the goal position to the new position of chased object
+            goalPos = currentlyChased.transform.position;
  
         }
+
+        //applies the movement rules and updates current state values
         movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
     }
 
     /// <summary>
-    /// 
+    ///     Updates the current state to be one of the passive states with a 0.5 probability
     /// </summary>
+    /// <returns>
+    ///     The state picked off of the random change 
+    /// </returns>
     private State updateState()
     {
+        //generates a random number between 0 and 1
         float stateProbability = Random.Range(0, 1f);
-        State newState = (stateProbability < 0.5f) ? State.Patrolling : State.Circling;
+
+        //changes state value depending on the value above
+        State newState = (stateProbability <= 0.5f) ? State.Patrolling : State.Circling;
         timeSinceLastStateChange = 0;
 
         return newState;
     }
 
     /// <summary>
-    /// Used to generate a random position from bounds that are parsed into it
+    ///     Used to generate a random position from bounds that are parsed into it
     /// </summary>
-    /// <param name="bounds"></param>
-    /// <returns>A vector generated from the bounds</returns>
+    /// <param name="bounds">
+    ///     The bounds for which the point is to be generated within
+    /// </param>
+    /// <returns>
+    ///     A Vector3 representing the goal postion generated from the bounds
+    /// </returns>
     private Vector3 generateGoalPos(Bounds bounds, float floorBoundary, Vector3 previousGoal)
     {
+        //sets the bounds to generate the position within
         Vector3 upperBound = bounds.max;
         Vector3 lowerBound = bounds.min;
         float xVal;
         float yVal;
         float zVal;
 
+        //if previously in different state or starting state is set to patrolling
         if (previousGoal == Vector3.zero || lastState != State.Patrolling)
         {
+            //generate new goal position 
             xVal = Random.Range(upperBound.x, lowerBound.x);
             yVal = Random.Range(upperBound.y - 2, floorBoundary);
             zVal = Random.Range(upperBound.z, lowerBound.z);
         }
         else
         {
+            //otherwise makes small adjustments to the goal position
             xVal = previousGoal.x + Random.value * goalAdjustment;
             yVal = previousGoal.y + Random.value * goalAdjustment;
             zVal = previousGoal.z + Random.value * goalAdjustment;
@@ -192,12 +240,20 @@ public class Triggerfish : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    ///     Updates the goal position from the circling state so that the position follows a circular path
     /// </summary>
-    /// <param name="theta"></param>
-    /// <param name="radius"></param>
+    /// <param name="theta">
+    ///     The current angle for the point to (based on starting angle)
+    /// </param>
+    /// <param name="radius">
+    ///     The radius of the circle that the point is circling around
+    /// </param>
+    /// <returns>
+    ///     The new position as a Vector3
+    /// </returns>
     private Vector3 updateCircleGoalPos(float theta,  float radius)
     {
+        //calculates the new positon based of the parametric equation of a circle
         float xVal = nest.transform.position.x + (radius * Mathf.Cos(theta)  * Time.deltaTime);
         float yVal = gameObject.transform.position.y;
         float zVal = nest.transform.position.z + (radius * Mathf.Sin(theta)) * Time.deltaTime; 
@@ -206,45 +262,36 @@ public class Triggerfish : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    ///     Apply the movement rules
     /// </summary>
-    /// <param name="closest"></param>
-    private void updateChasingGoalPos(GameObject closest)
-    {
-        if(gameObject.transform.position != closest.transform.position && closest != null)
-        {
-            goalPos = closest.transform.position;
-        }
-        else
-        {
-            updateState();
-        }
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="goalPos"></param>
     private void movement()
     {
+        //gets the direction between the Triggerfish and the goal position
         Vector3 direction = goalPos - gameObject.transform.position;
+        //rotates the Triggerfish object to face the goal position
         gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation,
                                                          Quaternion.LookRotation(direction),
                                                          turningSpeed * Time.deltaTime);
-        if (state != State.Chasing)
+
+        //cretes variable for acceleration adjustments
+        float adjustment = speed * accelerationFactor;
+
+        if (state == State.Chasing)
         {
-            //speed = (speed >= passiveLimiter * maxSpeed) ? speed - (speed * accelerationFactor) : Random.Range(minSpeed, passiveLimiter * maxSpeed);
-            //speed = (speed < passiveLimiter * maxSpeed)  ? speed + (speed * accelerationFactor) : Random.Range(minSpeed, passiveLimiter * maxSpeed);
-            speed = maxSpeed;
-            this.transform.Translate(0, 0, passiveLimiter * speed * Time.deltaTime);
+            //adjusts speed based on standard max speed
+            speed = (speed < maxSpeed) ? speed + adjustment :
+                        (speed >= maxSpeed) ? speed - adjustment : speed;
         }
-        else 
+        else
         {
-            speed = (speed >= maxSpeed) ? speed - (speed * accelerationFactor) : speed;
-            speed = (speed < maxSpeed)  ? speed + (speed * accelerationFactor) : speed;
-            this.transform.Translate(0, 0, speed * Time.deltaTime);
+            //sets the passive limit for maxSpeed reachable
+            float passiveMax = maxSpeed * passiveLimiter;
+            //adjusts speed based on passive limited speed
+            speed = (speed < passiveMax) ? speed + adjustment :
+                        (speed >= passiveMax) ? speed - adjustment : speed;
         }
+        //adjusts the position of the fish model in the scene
+        gameObject.transform.Translate(0, 0, speed * Time.deltaTime);
     }
 
     private float getCirclingRadius()
@@ -254,7 +301,6 @@ public class Triggerfish : MonoBehaviour
         float height = nest.GetComponent<MeshRenderer>().bounds.extents.y;
 
         float xPos = nest.transform.position.x;
-        //float xPos = ((height - nest.transform.position.y) / height) * 
         float yPos = gameObject.transform.position.y;
         float zPos = nest.transform.position.z;
 
