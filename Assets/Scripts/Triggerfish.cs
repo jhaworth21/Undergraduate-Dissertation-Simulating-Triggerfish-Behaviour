@@ -160,7 +160,7 @@ public class Triggerfish : MonoBehaviour
             //if chased for 15m, has reached the position or chased object is deleted
             float distnceFromChased = Vector3.Distance(gameObject.transform.position, goalPos);
             if (distanceChased > 15 || 
-                distanceChased <= gameObject.GetComponent<MeshRenderer>().bounds.extents.z || 
+                distanceChased <= gameObject.GetComponent<MeshCollider>().bounds.extents.z || 
                 !currentlyChased.activeInHierarchy)
             {
                 //updates the state to a passive state
@@ -197,6 +197,8 @@ public class Triggerfish : MonoBehaviour
 
         //changes state value depending on the value above
         State newState = (stateProbability <= 0.5f) ? State.Patrolling : State.Circling;
+        //Randomly change speed on passive state change if state changes
+        speed = (Random.Range(minSpeed, maxSpeed * passiveLimiter));
         timeSinceLastStateChange = 0;
 
         return newState;
@@ -274,21 +276,26 @@ public class Triggerfish : MonoBehaviour
                                                          turningSpeed * Time.deltaTime);
 
         //cretes variable for acceleration adjustments
-        float adjustment = speed * accelerationFactor;
+        float adjustment = speed * accelerationFactor * Time.deltaTime;
 
         if (state == State.Chasing)
         {
             //adjusts speed based on standard max speed
-            speed = (speed < maxSpeed) ? speed + adjustment :
-                        (speed >= maxSpeed) ? speed - adjustment : speed;
+            //speed = (speed < maxSpeed) ? speed + adjustment :
+            //            (speed >= maxSpeed) ? speed - adjustment : speed;
+            if (speed < maxSpeed) { speed += adjustment; }
+            else { speed -= adjustment; }
         }
         else
         {
             //sets the passive limit for maxSpeed reachable
             float passiveMax = maxSpeed * passiveLimiter;
+
             //adjusts speed based on passive limited speed
-            speed = (speed < passiveMax) ? speed + adjustment :
-                        (speed >= passiveMax) ? speed - adjustment : speed;
+            if (speed < passiveMax) { speed += adjustment; }
+            else { speed -= adjustment; }
+            //speed = (speed < passiveMax) ? speed + adjustment :
+            //            (speed >= passiveMax) ? speed - adjustment : speed;
         }
         //adjusts the position of the fish model in the scene
         gameObject.transform.Translate(0, 0, speed * Time.deltaTime);
