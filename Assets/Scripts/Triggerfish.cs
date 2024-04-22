@@ -35,7 +35,10 @@ public class Triggerfish : MonoBehaviour
     //header section for the tunable parameters not relating to movement
     [Header("Tunable Parameters")]
     public float goalAdjustment = 1f;
-    public float stateAdjustment = 5f;
+    public float probabilityAdjustment = 0.1f;
+    public float stateChangeThreshold = 0.5f;
+    private float baseStateChangeProbability;
+
 
     //header for the variables relating to the territory area and movement area
     [Header("Boundaries and Territory")]
@@ -88,6 +91,7 @@ public class Triggerfish : MonoBehaviour
 
         //inital value of the time since last state change
         timeSinceLastStateChange = 0;
+        baseStateChangeProbability = Random.Range(0, 1f);
     }
 
     // Update is called once per frame
@@ -123,7 +127,9 @@ public class Triggerfish : MonoBehaviour
             }
 
             //TODO - adjust so that higher probability not just given threshold
-            if(timeSinceLastStateChange > stateAdjustment || 
+            float adjustedProbability = baseStateChangeProbability * (timeSinceLastStateChange * probabilityAdjustment);
+            Debug.Log("adjusted probabilty = " + adjustedProbability);
+            if (adjustedProbability > stateChangeThreshold || 
                 (patrolAreaCollider.bounds.Contains(gameObject.transform.position) && lastState == State.Returning))
             {
                 //updates the state to randomly be circling or patrolling
@@ -194,11 +200,14 @@ public class Triggerfish : MonoBehaviour
     {
         //generates a random number between 0 and 1
         float stateProbability = Random.Range(0, 1f);
+        Debug.Log("probability for state change = " + stateProbability);
 
         //changes state value depending on the value above
         State newState = (stateProbability <= 0.5f) ? State.Patrolling : State.Circling;
         //Randomly change speed on passive state change if state changes
         speed = (Random.Range(minSpeed, maxSpeed * passiveLimiter));
+
+        baseStateChangeProbability = Random.Range(0, 1f);
         timeSinceLastStateChange = 0;
 
         return newState;

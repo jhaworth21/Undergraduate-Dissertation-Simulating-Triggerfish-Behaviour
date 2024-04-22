@@ -3131,7 +3131,8 @@ MonoBehaviour:
   circlingAngle: 0
   circlingRadius: 0
   goalAdjustment: 1
-  stateAdjustment: 5
+  probabilityAdjustment: 0.1
+  stateChangeThreshold: 0.5
   worldFloor: {fileID: 423502218}
   floorBoundary: 0
   nest: {fileID: 1086019980}
