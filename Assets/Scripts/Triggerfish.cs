@@ -205,7 +205,7 @@ public class Triggerfish : MonoBehaviour
         //changes state value depending on the value above
         State newState = (stateProbability <= 0.5f) ? State.Patrolling : State.Circling;
         //Randomly change speed on passive state change if state changes
-        speed = (Random.Range(minSpeed, maxSpeed * passiveLimiter));
+        speed = (state != lastState) ? (Random.Range(minSpeed, maxSpeed * passiveLimiter)) : speed;
 
         baseStateChangeProbability = Random.Range(0, 1f);
         timeSinceLastStateChange = 0;
