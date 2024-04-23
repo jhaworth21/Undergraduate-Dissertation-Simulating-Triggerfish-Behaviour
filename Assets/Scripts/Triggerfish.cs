@@ -8,9 +8,6 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 
-//TODO - Comment code
-//TODO - Fix issue where patrolling shows circling behaviour
-
 public class Triggerfish : MonoBehaviour
 {
     //specifies which random is being used
@@ -41,7 +38,7 @@ public class Triggerfish : MonoBehaviour
     //header section for the tunable parameters not relating to movement
     [Header("Probability Parameters")]
     public float goalAdjustment = 1f;
-    public float probabilityAdjustment = 0.1f;
+    public float passiveProbAdjustment = 0.1f;
     public float stateChangeThreshold = 0.5f;
     private float baseStateChangeProbability;
     private float chaseDistAdjuster = 0.25f;
@@ -111,7 +108,7 @@ public class Triggerfish : MonoBehaviour
         closest = getNearestObj(inNest);
 
         //if the chasing conditions are met
-        if (inNest.Count != 0 && checkInVision(closest) && currentlyChased == null)
+        if(checkChasingPreconditions(inNest, closest))
         {
             //set state to chasing and set currently chased to closest
             state = State.Chasing;
@@ -137,7 +134,7 @@ public class Triggerfish : MonoBehaviour
             }
 
             //adjusts the probability of changing state based on how long the fish has been in the same state and a constant
-            float adjustedProbability = baseStateChangeProbability + (timeSinceLastStateChange * probabilityAdjustment);
+            float adjustedProbability = baseStateChangeProbability + (timeSinceLastStateChange * passiveProbAdjustment);
 
             //if above the threshold or the fish has finished returining to the patrol area 
             if (adjustedProbability > stateChangeThreshold || 
@@ -369,6 +366,16 @@ public class Triggerfish : MonoBehaviour
             {
                 return false;
             }
+        }
+        return false;
+    }
+
+
+    private bool checkChasingPreconditions(List<GameObject> objsInTerritory, GameObject closestObj)
+    {
+        if (objsInTerritory.Count != 0 && checkInVision(closestObj) && currentlyChased == null)
+        {
+            return true;
         }
         return false;
     }

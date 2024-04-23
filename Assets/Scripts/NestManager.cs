@@ -17,12 +17,19 @@ public class NestManager : MonoBehaviour
     {
         if(objectsInNest.Count > 0)
         {
-            foreach (GameObject go in objectsInNest)
+            try
             {
-                if (!go.activeInHierarchy)
+                foreach (GameObject go in objectsInNest)
                 {
-                    objectsInNest.Remove(go);
+                    if (!go.activeInHierarchy)
+                    {
+                        objectsInNest.Remove(go);
+                    }
                 }
+            }
+            catch(System.Exception e)
+            {
+                Debug.Log(e.ToString());
             }
         }
     }
