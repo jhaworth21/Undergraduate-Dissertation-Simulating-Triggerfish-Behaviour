@@ -1,6 +1,9 @@
+using Meta.WitAi.Lib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -9,7 +12,10 @@ using Random = UnityEngine.Random;
 //TODO - Fix issue where patrolling shows circling behaviour
 
 public class Triggerfish : MonoBehaviour
-{   
+{
+    //specifies which random is being used
+    private System.Random random;
+
     //defines the possible states of the triggerfish
     private enum State { Chasing, Circling, Patrolling, Returning };
 
@@ -33,11 +39,13 @@ public class Triggerfish : MonoBehaviour
     private float circlingRadius;
     
     //header section for the tunable parameters not relating to movement
-    [Header("Tunable Parameters")]
+    [Header("Probability Parameters")]
     public float goalAdjustment = 1f;
     public float probabilityAdjustment = 0.1f;
     public float stateChangeThreshold = 0.5f;
     private float baseStateChangeProbability;
+    private float chaseDistAdjuster = 0.25f;
+    private float chaseDistance;
 
 
     //header for the variables relating to the territory area and movement area
@@ -103,11 +111,12 @@ public class Triggerfish : MonoBehaviour
         closest = getNearestObj(inNest);
 
         //if the chasing conditions are met
-        if (inNest.Count != 0 && checkInVision(closest)) //&& currentlyChased == null)
+        if (inNest.Count != 0 && checkInVision(closest) && currentlyChased == null)
         {
             //set state to chasing and set currently chased to closest
             state = State.Chasing;
             currentlyChased = closest;
+            chaseDistance = genChaseDist(chaseDistAdjuster, 1f, 15f);
         }
 
         //if state isn't in chasing (ie passive state)
@@ -126,9 +135,7 @@ public class Triggerfish : MonoBehaviour
                 goalPos = generateGoalPos(patrolAreaCollider.bounds, floorBoundary, goalPos);
             }
 
-            //TODO - adjust so that higher probability not just given threshold
-            float adjustedProbability = baseStateChangeProbability * (timeSinceLastStateChange * probabilityAdjustment);
-            Debug.Log("adjusted probabilty = " + adjustedProbability);
+            float adjustedProbability = baseStateChangeProbability + (timeSinceLastStateChange * probabilityAdjustment);
             if (adjustedProbability > stateChangeThreshold || 
                 (patrolAreaCollider.bounds.Contains(gameObject.transform.position) && lastState == State.Returning))
             {
@@ -164,13 +171,20 @@ public class Triggerfish : MonoBehaviour
         if(state == State.Chasing)
         {
             //if chased for 15m, has reached the position or chased object is deleted
-            float distnceFromChased = Vector3.Distance(gameObject.transform.position, goalPos);
-            if (distanceChased > 15 || 
-                distanceChased <= gameObject.GetComponent<MeshCollider>().bounds.extents.z || 
-                !currentlyChased.activeInHierarchy)
+            if (!currentlyChased.activeInHierarchy)
             {
                 //updates the state to a passive state
                 state = updateState();
+            }
+
+            bool triggerFishInNest = nestMeshCollider.bounds.Contains(gameObject.transform.position);
+
+            if (!triggerFishInNest)
+            {
+                if (distanceChased > chaseDistance)
+                {
+                    state = updateState();
+                }
             }
             //updates the distance chased (from center of nest)
             distanceChased = Vector3.Distance(new Vector3(
@@ -178,10 +192,10 @@ public class Triggerfish : MonoBehaviour
                                                           gameObject.transform.position.y, 
                                                           nest.transform.position.z),
                                               gameObject.transform.position);
+            Debug.Log("distance to chase: " + chaseDistance + "\n distance chased: " + distanceChased);
 
             //updates the goal position to the new position of chased object
             goalPos = currentlyChased.transform.position;
- 
         }
 
         //applies the movement rules and updates current state values
@@ -200,7 +214,6 @@ public class Triggerfish : MonoBehaviour
     {
         //generates a random number between 0 and 1
         float stateProbability = Random.Range(0, 1f);
-        Debug.Log("probability for state change = " + stateProbability);
 
         //changes state value depending on the value above
         State newState = (stateProbability <= 0.5f) ? State.Patrolling : State.Circling;
@@ -227,25 +240,10 @@ public class Triggerfish : MonoBehaviour
         //sets the bounds to generate the position within
         Vector3 upperBound = bounds.max;
         Vector3 lowerBound = bounds.min;
-        float xVal;
-        float yVal;
-        float zVal;
 
-        //if previously in different state or starting state is set to patrolling
-        if (previousGoal == Vector3.zero || lastState != State.Patrolling)
-        {
-            //generate new goal position 
-            xVal = Random.Range(upperBound.x, lowerBound.x);
-            yVal = Random.Range(upperBound.y - 2, floorBoundary);
-            zVal = Random.Range(upperBound.z, lowerBound.z);
-        }
-        else
-        {
-            //otherwise makes small adjustments to the goal position
-            xVal = previousGoal.x + Random.value * goalAdjustment;
-            yVal = previousGoal.y + Random.value * goalAdjustment;
-            zVal = previousGoal.z + Random.value * goalAdjustment;
-        }
+        float xVal = Random.Range(upperBound.x, lowerBound.x);
+        float yVal = Random.Range(upperBound.y - 2, floorBoundary);
+        float zVal = Random.Range(upperBound.z, lowerBound.z);
 
         return new Vector3(xVal, yVal, zVal);
     }
@@ -290,8 +288,6 @@ public class Triggerfish : MonoBehaviour
         if (state == State.Chasing)
         {
             //adjusts speed based on standard max speed
-            //speed = (speed < maxSpeed) ? speed + adjustment :
-            //            (speed >= maxSpeed) ? speed - adjustment : speed;
             if (speed < maxSpeed) { speed += adjustment; }
             else { speed -= adjustment; }
         }
@@ -303,8 +299,6 @@ public class Triggerfish : MonoBehaviour
             //adjusts speed based on passive limited speed
             if (speed < passiveMax) { speed += adjustment; }
             else { speed -= adjustment; }
-            //speed = (speed < passiveMax) ? speed + adjustment :
-            //            (speed >= passiveMax) ? speed - adjustment : speed;
         }
         //adjusts the position of the fish model in the scene
         gameObject.transform.Translate(0, 0, speed * Time.deltaTime);
@@ -341,8 +335,18 @@ public class Triggerfish : MonoBehaviour
     {
         if (closestObj != null)
         {
-            float angle = Vector3.Angle(gameObject.transform.forward, closestObj.transform.position);
+            Vector3 direction = closestObj.transform.position - gameObject.transform.position;
+            direction.Normalize();
+
+            Vector3 triggerfishForward = gameObject.transform.forward;
+            triggerfishForward.Normalize();
+
+            float dotProduct = Vector3.Dot(direction, triggerfishForward);
+            float angle = Mathf.Acos(dotProduct) * Mathf.Rad2Deg;
+
+            //float angle = Vector3.Angle(gameObject.transform.forward, closestObj.transform.position);
             float distance = Vector3.Distance(gameObject.transform.position, closestObj.transform.position);
+            Debug.Log("Distance = " +  distance + "\nAngle = " + angle);
             if (angle <= viewAngle && distance <= viewRange)
             {
                 return true;
@@ -384,5 +388,27 @@ public class Triggerfish : MonoBehaviour
             return closest;
         }
         return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="lambda"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    private float genChaseDist(float lambda, float min, float max)
+    {
+        random = new System.Random();
+
+        // generates a random value from exponential distribution
+        float randNum = (float)random.NextDouble();
+        Debug.Log("random number = " + randNum);
+        float result = (float)(-Mathf.Log(1 - randNum) / lambda);
+
+        // scales the result to fit within min and max
+        result = Mathf.Clamp(result, min, max);
+
+        return result;
     }
 }

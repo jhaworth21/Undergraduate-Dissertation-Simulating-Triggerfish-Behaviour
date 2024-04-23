@@ -3131,17 +3131,18 @@ MonoBehaviour:
   circlingAngle: 0
   circlingRadius: 0
   goalAdjustment: 1
-  probabilityAdjustment: 0.1
+  probabilityAdjustment: 0.05
   stateChangeThreshold: 0.5
+  chasingProbThreshold: 0.1
   worldFloor: {fileID: 423502218}
   floorBoundary: 0
   nest: {fileID: 1086019980}
   patrolArea: {fileID: 1985945747}
   speed: 1
   turningSpeed: 1
-  minSpeed: 0.25
+  minSpeed: 0.5
   maxSpeed: 2.4
-  accelerationFactor: 0.4
+  accelerationFactor: 0.25
   passiveLimiter: 0.75
   viewRange: 15
   viewAngle: 45
@@ -3564,7 +3565,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 301860171690533778, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
