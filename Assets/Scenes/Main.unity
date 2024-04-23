@@ -3133,7 +3133,6 @@ MonoBehaviour:
   goalAdjustment: 1
   probabilityAdjustment: 0.05
   stateChangeThreshold: 0.5
-  chasingProbThreshold: 0.1
   worldFloor: {fileID: 423502218}
   floorBoundary: 0
   nest: {fileID: 1086019980}
@@ -3144,7 +3143,7 @@ MonoBehaviour:
   maxSpeed: 2.4
   accelerationFactor: 0.25
   passiveLimiter: 0.75
-  viewRange: 15
+  viewRange: 35
   viewAngle: 45
 --- !u!64 &1839271499
 MeshCollider:

@@ -116,6 +116,7 @@ public class Triggerfish : MonoBehaviour
             //set state to chasing and set currently chased to closest
             state = State.Chasing;
             currentlyChased = closest;
+            //generates a distance to chase the object based on an exponential probability 
             chaseDistance = genChaseDist(chaseDistAdjuster, 1f, 15f);
         }
 
@@ -135,7 +136,10 @@ public class Triggerfish : MonoBehaviour
                 goalPos = generateGoalPos(patrolAreaCollider.bounds, floorBoundary, goalPos);
             }
 
+            //adjusts the probability of changing state based on how long the fish has been in the same state and a constant
             float adjustedProbability = baseStateChangeProbability + (timeSinceLastStateChange * probabilityAdjustment);
+
+            //if above the threshold or the fish has finished returining to the patrol area 
             if (adjustedProbability > stateChangeThreshold || 
                 (patrolAreaCollider.bounds.Contains(gameObject.transform.position) && lastState == State.Returning))
             {
@@ -177,12 +181,15 @@ public class Triggerfish : MonoBehaviour
                 state = updateState();
             }
 
-            bool triggerFishInNest = nestMeshCollider.bounds.Contains(gameObject.transform.position);
+            //check to see if the object being chased is within the nest still 
+            bool chasedInNest = nestMeshCollider.bounds.Contains(goalPos);
 
-            if (!triggerFishInNest)
+            //if not checks if the Triggerfish has chased the object a generated distance
+            if (!chasedInNest)
             {
                 if (distanceChased > chaseDistance)
                 {
+                    //if so updates the state
                     state = updateState();
                 }
             }
@@ -192,7 +199,6 @@ public class Triggerfish : MonoBehaviour
                                                           gameObject.transform.position.y, 
                                                           nest.transform.position.z),
                                               gameObject.transform.position);
-            Debug.Log("distance to chase: " + chaseDistance + "\n distance chased: " + distanceChased);
 
             //updates the goal position to the new position of chased object
             goalPos = currentlyChased.transform.position;
@@ -241,6 +247,7 @@ public class Triggerfish : MonoBehaviour
         Vector3 upperBound = bounds.max;
         Vector3 lowerBound = bounds.min;
 
+        //generates a positon vector from the bounds provided
         float xVal = Random.Range(upperBound.x, lowerBound.x);
         float yVal = Random.Range(upperBound.y - 2, floorBoundary);
         float zVal = Random.Range(upperBound.z, lowerBound.z);
@@ -271,7 +278,7 @@ public class Triggerfish : MonoBehaviour
     }
 
     /// <summary>
-    ///     Apply the movement rules
+    ///     Apply the movement rules to the GameObject 
     /// </summary>
     private void movement()
     {
@@ -304,6 +311,12 @@ public class Triggerfish : MonoBehaviour
         gameObject.transform.Translate(0, 0, speed * Time.deltaTime);
     }
 
+    /// <summary>
+    ///     Calculates the circling radius from the nest based on the current position of the GameObject
+    /// </summary>
+    /// <returns>
+    ///     Returns the distance between the nest and Triggerfish
+    /// </returns>
     private float getCirclingRadius()
     {
         //definitions of the points to create the vector to rotate around
@@ -314,6 +327,7 @@ public class Triggerfish : MonoBehaviour
         float yPos = gameObject.transform.position.y;
         float zPos = nest.transform.position.z;
 
+        //creates the point to rotate the fish around
         Vector3 rotationPoint = new Vector3(xPos, yPos, zPos);
 
         return Vector3.Distance(gameObject.transform.position, rotationPoint);
@@ -391,22 +405,29 @@ public class Triggerfish : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    ///     Uses an exponential distribution to determine how far the Triggerfish should chase an object 
     /// </summary>
-    /// <param name="lambda"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
+    /// <param name="lambda">
+    ///     Step adjustment parameter (rate of decay for the proability
+    /// </param>
+    /// <param name="min">
+    ///     The minimum distance a fish can chase something
+    /// </param>
+    /// <param name="max">
+    ///     The maximum distance a fish can chase something (should be capped around 15
+    /// </param>
+    /// <returns>   
+    ///     The generated distance the object should be chased based on the probability distribution
+    /// </returns>
     private float genChaseDist(float lambda, float min, float max)
     {
         random = new System.Random();
 
-        // generates a random value from exponential distribution
+        //generates a random value from exponential distribution
         float randNum = (float)random.NextDouble();
-        Debug.Log("random number = " + randNum);
         float result = (float)(-Mathf.Log(1 - randNum) / lambda);
 
-        // scales the result to fit within min and max
+        //scales the result to fit within min and max
         result = Mathf.Clamp(result, min, max);
 
         return result;
