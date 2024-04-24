@@ -65,12 +65,12 @@ public class School : MonoBehaviour
                 nDistance = Vector3.Distance(go.transform.position, gameObject.transform.position);
                 if (nDistance <= SchoolManager.SM.neighbourDistance)
                 {
-                    vcenter += go.transform.position;
+                    vcenter += SchoolManager.SM.cohesionWeighting * go.transform.position;
                     groupSize++;
 
                     if (nDistance < 1.0f)
                     {
-                        vavoid = vavoid + (gameObject.transform.position - go.transform.position);
+                        vavoid = vavoid * SchoolManager.SM.separationWeighting + (gameObject.transform.position - go.transform.position);
                     }
 
                     School anotherFlock = go.GetComponent<School>();
@@ -89,7 +89,7 @@ public class School : MonoBehaviour
                 speed = SchoolManager.SM.maxSpeed;
             }
 
-            Vector3 direction = (vcenter + vavoid) - transform.position;
+            Vector3 direction = (vcenter + vavoid) * SchoolManager.SM.alignmentWeighting - transform.position;
             if (direction != Vector3.zero)
                 transform.rotation = Quaternion.Slerp(transform.rotation,
                                                       Quaternion.LookRotation(direction),

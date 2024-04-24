@@ -24,6 +24,12 @@ public class SchoolManager : MonoBehaviour
     [Range(1.0f, 10.0f)] public float neighbourDistance;
     [Range(1.0f, 5.0f)] public float rotationSpeed;
 
+    [Header("Weighting Parameters")]
+    [Range(0.0f, 1.0f)] public float cohesionWeighting;
+    [Range(0.0f, 1.0f)] public float alignmentWeighting;
+    [Range(0.0f, 1.0f)] public float separationWeighting;
+
+
     // Start is called before the first frame update
     void Start()
     {
