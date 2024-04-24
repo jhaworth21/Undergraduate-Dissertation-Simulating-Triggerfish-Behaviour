@@ -370,7 +370,12 @@ public class Triggerfish : MonoBehaviour
         return false;
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="objsInTerritory"></param>
+    /// <param name="closestObj"></param>
+    /// <returns></returns>
     private bool checkChasingPreconditions(List<GameObject> objsInTerritory, GameObject closestObj)
     {
         if (objsInTerritory.Count != 0 && checkInVision(closestObj) && currentlyChased == null)

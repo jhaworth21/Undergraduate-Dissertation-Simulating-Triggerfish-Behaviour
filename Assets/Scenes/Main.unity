@@ -1148,7 +1148,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &835266264
 Transform:
   m_ObjectHideFlags: 0
@@ -1176,13 +1176,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14f608fbddd96604388c386257c0a466, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fishPrefab: {fileID: 919132149155446097, guid: 176babf74cab22544ab365d01043383a, type: 3}
+  fishPrefab: {fileID: 5066407042696303028, guid: 50c2e8b77b4adf44a94b39f0a05c6bd6, type: 3}
   numFish: 20
   allFish: []
-  swimLimits: {x: 5, y: 5, z: 5}
+  swimLimits: {x: 3, y: 3, z: 3}
   goalPos: {x: 0, y: 0, z: 0}
-  minSpeed: 0
-  maxSpeed: 0
+  minSpeed: 0.25
+  maxSpeed: 2
   neighbourDistance: 0
   rotationSpeed: 0
 --- !u!1001 &900409510
@@ -3131,7 +3131,7 @@ MonoBehaviour:
   circlingAngle: 0
   circlingRadius: 0
   goalAdjustment: 1
-  probabilityAdjustment: 0.05
+  passiveProbAdjustment: 0.1
   stateChangeThreshold: 0.5
   worldFloor: {fileID: 423502218}
   floorBoundary: 0

@@ -5,7 +5,7 @@ using UnityEngine;
 public class SchoolManager : MonoBehaviour
 {
     //
-    public static SchoolManager FM;
+    public static SchoolManager SM;
     public GameObject fishPrefab;
     public int numFish = 20;
     public GameObject[] allFish;
@@ -25,17 +25,15 @@ public class SchoolManager : MonoBehaviour
         allFish = new GameObject[numFish];
         for (int i = 0; i < numFish; ++i)
         {
-            Vector3 pos = this.transform.position + new Vector3(
-                Random.Range(-swimLimits.x, swimLimits.x),
-                Random.Range(-swimLimits.y, swimLimits.y),
-                Random.Range(-swimLimits.z, swimLimits.z));
+            Vector3 pos = this.transform.position + new Vector3(Random.Range(-swimLimits.x, swimLimits.x),
+                                                                Random.Range(-swimLimits.y, swimLimits.y),
+                                                                Random.Range(-swimLimits.z, swimLimits.z));
 
             allFish[i] = Instantiate(fishPrefab, pos, Quaternion.identity);
             allFish[i].AddComponent<TerritoryCheck>();
-            allFish[i].AddComponent<School>();
         }
+        SM = this;
 
-        FM = this;
         goalPos = this.transform.position;
 
     }

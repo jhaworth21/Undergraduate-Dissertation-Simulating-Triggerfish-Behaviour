@@ -4,20 +4,21 @@ using UnityEngine;
 
 public class School : MonoBehaviour
 {
+
     float speed;
     bool turning;
 
     // Start is called before the first frame update
     void Start()
     {
-        speed = Random.Range(SchoolManager.FM.minSpeed, SchoolManager.FM.maxSpeed);
+        speed = Random.Range(SchoolManager.SM.minSpeed, SchoolManager.SM.maxSpeed);
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        Bounds b = new Bounds(SchoolManager.FM.transform.position, SchoolManager.FM.swimLimits * 2);
+        Bounds b = new Bounds(SchoolManager.SM.transform.position, SchoolManager.SM.swimLimits * 2);
 
         if (!b.Contains(transform.position))
         {
@@ -30,16 +31,16 @@ public class School : MonoBehaviour
 
         if (turning)
         {
-            Vector3 direction = SchoolManager.FM.transform.position - transform.position;
+            Vector3 direction = SchoolManager.SM.transform.position - transform.position;
             transform.rotation = Quaternion.Slerp(transform.rotation,
                                                   Quaternion.LookRotation(direction),
-                                                  SchoolManager.FM.rotationSpeed * Time.deltaTime);
+                                                  SchoolManager.SM.rotationSpeed * Time.deltaTime);
         }
         else
         {
             if (Random.Range(0, 100) < 10)
             {
-                speed = Random.Range(SchoolManager.FM.minSpeed, SchoolManager.FM.maxSpeed);
+                speed = Random.Range(SchoolManager.SM.minSpeed, SchoolManager.SM.maxSpeed);
                 ApplyRules();
             }
         }
@@ -52,7 +53,7 @@ public class School : MonoBehaviour
     void ApplyRules()
     {
         GameObject[] gos;
-        gos = SchoolManager.FM.allFish;
+        gos = SchoolManager.SM.allFish;
 
         Vector3 vcenter = Vector3.zero;
         Vector3 vavoid = Vector3.zero;
@@ -65,7 +66,7 @@ public class School : MonoBehaviour
             if (go != this.gameObject)
             {
                 nDistance = Vector3.Distance(go.transform.position, this.transform.position);
-                if (nDistance <= SchoolManager.FM.neighbourDistance)
+                if (nDistance <= SchoolManager.SM.neighbourDistance)
                 {
                     vcenter += go.transform.position;
                     groupSize++;
@@ -84,18 +85,18 @@ public class School : MonoBehaviour
 
         if (groupSize > 0)
         {
-            vcenter = vcenter / groupSize + (SchoolManager.FM.goalPos - this.transform.position);
+            vcenter = vcenter / groupSize + (SchoolManager.SM.goalPos - this.transform.position);
             speed = gSpeed / groupSize;
-            if (speed > SchoolManager.FM.maxSpeed)
+            if (speed > SchoolManager.SM.maxSpeed)
             {
-                speed = SchoolManager.FM.maxSpeed;
+                speed = SchoolManager.SM.maxSpeed;
             }
 
             Vector3 direction = (vcenter + vavoid) - transform.position;
             if (direction != Vector3.zero)
                 transform.rotation = Quaternion.Slerp(transform.rotation,
                                                       Quaternion.LookRotation(direction),
-                                                      SchoolManager.FM.rotationSpeed * Time.deltaTime);
+                                                      SchoolManager.SM.rotationSpeed * Time.deltaTime);
 
 
 
