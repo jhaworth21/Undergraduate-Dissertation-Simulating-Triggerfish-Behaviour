@@ -357,7 +357,6 @@ public class Triggerfish : MonoBehaviour
 
             //float angle = Vector3.Angle(gameObject.transform.forward, closestObj.transform.position);
             float distance = Vector3.Distance(gameObject.transform.position, closestObj.transform.position);
-            Debug.Log("Distance = " +  distance + "\nAngle = " + angle);
             if (angle <= viewAngle && distance <= viewRange)
             {
                 return true;

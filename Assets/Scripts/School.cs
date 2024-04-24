@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class School : MonoBehaviour
 {
-
     float speed;
     bool turning;
 
@@ -18,7 +17,7 @@ public class School : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Bounds b = new Bounds(SchoolManager.SM.transform.position, SchoolManager.SM.swimLimits * 2);
+        Bounds b = new Bounds(SchoolManager.SM.transform.position, SchoolManager.SM.schoolLimit * 2);
 
         if (!b.Contains(transform.position))
         {
@@ -35,6 +34,7 @@ public class School : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation,
                                                   Quaternion.LookRotation(direction),
                                                   SchoolManager.SM.rotationSpeed * Time.deltaTime);
+            Debug.Log("Transform Rotation = " +  transform.rotation);
         }
         else
         {
@@ -44,12 +44,9 @@ public class School : MonoBehaviour
                 ApplyRules();
             }
         }
-        this.transform.Translate(0, 0, speed * Time.deltaTime);
+        gameObject.transform.Translate(0, 0, speed * Time.deltaTime);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     void ApplyRules()
     {
         GameObject[] gos;
@@ -63,9 +60,9 @@ public class School : MonoBehaviour
 
         foreach (GameObject go in gos)
         {
-            if (go != this.gameObject)
+            if (go != gameObject)
             {
-                nDistance = Vector3.Distance(go.transform.position, this.transform.position);
+                nDistance = Vector3.Distance(go.transform.position, gameObject.transform.position);
                 if (nDistance <= SchoolManager.SM.neighbourDistance)
                 {
                     vcenter += go.transform.position;
@@ -73,11 +70,11 @@ public class School : MonoBehaviour
 
                     if (nDistance < 1.0f)
                     {
-                        vavoid = vavoid + (this.transform.position - go.transform.position);
+                        vavoid = vavoid + (gameObject.transform.position - go.transform.position);
                     }
 
-                    School anotherSchool = go.GetComponent<School>();
-                    gSpeed = gSpeed + anotherSchool.speed;
+                    School anotherFlock = go.GetComponent<School>();
+                    gSpeed = gSpeed + anotherFlock.speed;
                 }
             }
         }
@@ -85,7 +82,7 @@ public class School : MonoBehaviour
 
         if (groupSize > 0)
         {
-            vcenter = vcenter / groupSize + (SchoolManager.SM.goalPos - this.transform.position);
+            vcenter = vcenter / groupSize + (SchoolManager.SM.goalPos - gameObject.transform.position);
             speed = gSpeed / groupSize;
             if (speed > SchoolManager.SM.maxSpeed)
             {
@@ -103,3 +100,4 @@ public class School : MonoBehaviour
         }
     }
 }
+
