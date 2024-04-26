@@ -47,56 +47,75 @@ public class School : MonoBehaviour
         gameObject.transform.Translate(0, 0, speed * Time.deltaTime);
     }
 
+    /// <summary>
+    /// Applies the boids model ruleset to the movement of the gameObject
+    /// </summary>
     void ApplyRules()
     {
-        GameObject[] gos;
-        gos = SchoolManager.SM.allFish;
+        //gets all of the fish in the school
+        GameObject[] allFish;
+        allFish = SchoolManager.SM.allFish;
 
+        //initialises the center and avoidance vectors
         Vector3 vcenter = Vector3.zero;
         Vector3 vavoid = Vector3.zero;
+
+        //sets a base value for the group speed and size
         float gSpeed = 0.01f;
-        float nDistance;
         int groupSize = 0;
 
-        foreach (GameObject go in gos)
+        //creates the varaible representing neighbour distance
+        float nDistance;
+
+        //loops through all fish in the school
+        foreach (GameObject fish in allFish)
         {
-            if (go != gameObject)
+            //if not current fish
+            if (fish != gameObject)
             {
-                nDistance = Vector3.Distance(go.transform.position, gameObject.transform.position);
+                //gets the distance between current fish and currently fish at position in the loop
+                nDistance = Vector3.Distance(fish.transform.position, gameObject.transform.position);
+                //comparison against neighbour distance limit
                 if (nDistance <= SchoolManager.SM.neighbourDistance)
                 {
-                    vcenter += SchoolManager.SM.cohesionWeighting * go.transform.position;
+                    //adds the position to the center vector based on weighting value
+                    vcenter += SchoolManager.SM.cohesionWeighting * fish.transform.position;
                     groupSize++;
 
+                    //if too close
                     if (nDistance < 1.0f)
                     {
-                        vavoid = vavoid * SchoolManager.SM.separationWeighting + (gameObject.transform.position - go.transform.position);
+                        //adds the difference to avoidance vector with weighting applied
+                        vavoid = vavoid * SchoolManager.SM.separationWeighting + (gameObject.transform.position - fish.transform.position);
                     }
 
-                    School anotherFlock = go.GetComponent<School>();
+                    //gets the other schools in the overall swarm
+                    School anotherFlock = fish.GetComponent<School>();
                     gSpeed = gSpeed + anotherFlock.speed;
                 }
             }
         }
 
 
+        //if school has any fish
         if (groupSize > 0)
         {
+            //center is the average position
             vcenter = vcenter / groupSize + (SchoolManager.SM.goalPos - gameObject.transform.position);
+            //average the speed across the school
             speed = gSpeed / groupSize;
+            //resets speed to max if max exceeded
             if (speed > SchoolManager.SM.maxSpeed)
             {
                 speed = SchoolManager.SM.maxSpeed;
             }
 
+            //creates the direction vector to control the forward movement of the fish
             Vector3 direction = (vcenter + vavoid) * SchoolManager.SM.alignmentWeighting - transform.position;
             if (direction != Vector3.zero)
                 transform.rotation = Quaternion.Slerp(transform.rotation,
                                                       Quaternion.LookRotation(direction),
                                                       SchoolManager.SM.rotationSpeed * Time.deltaTime);
-
-
-
         }
     }
 }

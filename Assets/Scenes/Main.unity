@@ -1212,14 +1212,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fishPrefab: {fileID: 5066407042696303028, guid: 50c2e8b77b4adf44a94b39f0a05c6bd6, type: 3}
-  numFish: 3
+  schoolSize: 20
   allFish: []
-  swimLimits: {x: 4, y: 4, z: 4}
+  schoolLimit: {x: 10, y: 10, z: 10}
   goalPos: {x: 0, y: 0, z: 0}
+  swimmingBounds: {fileID: 1194598745}
   minSpeed: 0.5
   maxSpeed: 2
   neighbourDistance: 0
   rotationSpeed: 0
+  cohesionWeighting: 1
+  alignmentWeighting: 1
+  separationWeighting: 1
 --- !u!1001 &900409510
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1862,8 +1866,8 @@ Transform:
   m_GameObject: {fileID: 1194598745}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.1046, y: -12.5642, z: -11.6279}
-  m_LocalScale: {x: 111.974915, y: 19.068398, z: 109.86576}
+  m_LocalPosition: {x: 43.0437, y: -12.5642, z: -38.1518}
+  m_LocalScale: {x: 38.09387, y: 19.068398, z: 56.82257}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3280,7 +3284,7 @@ MonoBehaviour:
   patrolArea: {fileID: 1985945747}
   speed: 1
   turningSpeed: 1
-  minSpeed: 0.5
+  minSpeed: 0.75
   maxSpeed: 2.4
   accelerationFactor: 0.25
   passiveLimiter: 0.75

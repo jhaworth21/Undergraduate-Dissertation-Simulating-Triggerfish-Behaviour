@@ -8,7 +8,7 @@ public class SchoolManager : MonoBehaviour
     public static SchoolManager SM;
     public GameObject fishPrefab;
 
-    public int numFish = 20;
+    public int schoolSize = 20;
     public GameObject[] allFish;
 
     public Vector3 schoolLimit = new Vector3(10.0f, 10.0f, 10.0f);
@@ -35,8 +35,8 @@ public class SchoolManager : MonoBehaviour
     {
         swimmingBoundsMesh = swimmingBounds.GetComponent<MeshRenderer>();
 
-        allFish = new GameObject[numFish];
-        for (int i = 0; i < numFish; ++i)
+        allFish = new GameObject[schoolSize];
+        for (int i = 0; i < schoolSize; ++i)
         {
             Vector3 pos = this.transform.position + new Vector3(
                 Random.Range(-schoolLimit.x, schoolLimit.x),
