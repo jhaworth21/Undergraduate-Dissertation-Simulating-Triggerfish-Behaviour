@@ -1183,7 +1183,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &835266264
 Transform:
   m_ObjectHideFlags: 0
@@ -3276,8 +3276,10 @@ MonoBehaviour:
   circlingAngle: 0
   circlingRadius: 0
   goalAdjustment: 1
-  passiveProbAdjustment: 0.1
+  timeAdjustment: 10
   stateChangeThreshold: 0.5
+  stateChangeWeight: 0.5
+  numTrials: 250
   worldFloor: {fileID: 423502218}
   floorBoundary: 0
   nest: {fileID: 1086019980}
@@ -3709,7 +3711,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 301860171690533778, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

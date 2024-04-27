@@ -15,6 +15,7 @@ public class Triggerfish : MonoBehaviour
 
     //defines the possible states of the triggerfish
     private enum State { Chasing, Circling, Patrolling, Returning };
+    private List<float> testList = new List<float>();
 
     //header section for the variables relating to the current state
     [Header("State Variables")]
@@ -38,12 +39,19 @@ public class Triggerfish : MonoBehaviour
     //header section for the tunable parameters not relating to movement
     [Header("Probability Parameters")]
     public float goalAdjustment = 1f;
-    public float passiveProbAdjustment = 0.1f;
+    public float timeAdjustment = 0.5f;
     public float stateChangeThreshold = 0.5f;
+    public float stateChangeWeight = 0.48f;
+    public float numTrials;
     private float baseStateChangeProbability;
     private float chaseDistAdjuster = 0.25f;
     private float chaseDistance;
 
+    private float numOfStateChange = 0f;
+    private float numPToC = 0f;
+    private float numPToP = 0f;
+    private float numCToP = 0f;
+    private float numCToC = 0f;
 
     //header for the variables relating to the territory area and movement area
     [Header("Boundaries and Territory")]
@@ -114,7 +122,7 @@ public class Triggerfish : MonoBehaviour
             state = State.Chasing;
             currentlyChased = closest;
             //generates a distance to chase the object based on an exponential probability 
-            chaseDistance = genChaseDist(chaseDistAdjuster, 1f, 15f);
+            chaseDistance = genChaseDist(chaseDistAdjuster, 1f, 30f);
         }
 
         //if state isn't in chasing (ie passive state)
@@ -134,7 +142,7 @@ public class Triggerfish : MonoBehaviour
             }
 
             //adjusts the probability of changing state based on how long the fish has been in the same state and a constant
-            float adjustedProbability = baseStateChangeProbability + (timeSinceLastStateChange * passiveProbAdjustment);
+            float adjustedProbability = baseStateChangeProbability + (timeSinceLastStateChange * timeAdjustment);
 
             //if above the threshold or the fish has finished returining to the patrol area 
             if (adjustedProbability > stateChangeThreshold || 
@@ -205,6 +213,17 @@ public class Triggerfish : MonoBehaviour
         movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
+
+        Debug.Log("number of State Changes = " + numOfStateChange + 
+            "\nCircling -> Circling = " +  numCToC + 
+            "\n Circling -> Patrolling = " + numCToP + 
+            "\n Patrolling -> Patrolling = " + numPToP + 
+            "\nPatrolling -> Circling = " + numPToC);
+
+        if (numOfStateChange >= numTrials)
+        {
+            Debug.Break();
+        }
     }
 
     /// <summary>
@@ -215,15 +234,37 @@ public class Triggerfish : MonoBehaviour
     /// </returns>
     private State updateState()
     {
+
         //generates a random number between 0 and 1
         float stateProbability = Random.Range(0, 1f);
 
         //changes state value depending on the value above
-        State newState = (stateProbability <= 0.5f) ? State.Patrolling : State.Circling;
+        State newState = (stateProbability <= stateChangeWeight) ? State.Patrolling : State.Circling;
         //Randomly change speed on passive state change if state changes
         speed = (Random.Range(minSpeed, maxSpeed * passiveLimiter));
 
-        baseStateChangeProbability = Random.Range(0, 1f);
+        if ((state == State.Circling) && (newState == State.Circling))
+        {
+            numOfStateChange++;
+            numCToC++;
+        }
+        else if((state == State.Circling) && (newState == State.Patrolling))
+        {
+            numOfStateChange++;
+            numCToP++;
+        }
+        else if((state == State.Patrolling) && (newState == State.Patrolling))
+        {
+            numOfStateChange++;
+            numPToP++;
+        }
+        else if((state == State.Patrolling) && (newState == State.Circling))
+        {
+            numOfStateChange++;
+            numPToC++;
+        }
+
+            baseStateChangeProbability = Random.Range(0, 1f);
         timeSinceLastStateChange = 0;
 
         return newState;
