@@ -3276,10 +3276,10 @@ MonoBehaviour:
   circlingAngle: 0
   circlingRadius: 0
   goalAdjustment: 1
-  timeAdjustment: 10
+  timeAdjustment: 0.1
   stateChangeThreshold: 0.5
-  stateChangeWeight: 0.5
-  numTrials: 250
+  stateChangeWeight: 0.48
+  chaseDistAdjuster: 0.15
   worldFloor: {fileID: 423502218}
   floorBoundary: 0
   nest: {fileID: 1086019980}
@@ -3291,7 +3291,7 @@ MonoBehaviour:
   accelerationFactor: 0.25
   passiveLimiter: 0.75
   viewRange: 35
-  viewAngle: 45
+  viewAngle: 360
 --- !u!64 &1839271499
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3711,7 +3711,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 301860171690533778, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

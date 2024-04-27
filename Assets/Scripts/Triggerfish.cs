@@ -2,9 +2,11 @@ using Meta.WitAi.Lib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEditor;
 using Random = UnityEngine.Random;
 
 
@@ -43,7 +45,7 @@ public class Triggerfish : MonoBehaviour
     public float stateChangeThreshold = 0.5f;
     public float stateChangeWeight = 0.48f;
     private float baseStateChangeProbability;
-    private float chaseDistAdjuster = 0.25f;
+    public float chaseDistAdjuster = 0.25f;
     private float chaseDistance;
 
     //header for the variables relating to the territory area and movement area
@@ -68,13 +70,17 @@ public class Triggerfish : MonoBehaviour
     public float turningSpeed;
     public float minSpeed;
     public float maxSpeed;
-    public float accelerationFactor;
+    public float passiveAccerleration;
+    public float chasingAccerleration;
     public float passiveLimiter;
 
     //header for the variables related to vision
     [Header("Vision")]
     public float viewRange;
     public float viewAngle;
+
+    //Parameters used in testing
+    List<float> distances = new List<float>();
 
 
     // Start is called before the first frame update
@@ -116,6 +122,7 @@ public class Triggerfish : MonoBehaviour
             currentlyChased = closest;
             //generates a distance to chase the object based on an exponential probability 
             chaseDistance = genChaseDist(chaseDistAdjuster, 1f, 30f);
+            distances.Add(chaseDistance);
         }
 
         //if state isn't in chasing (ie passive state)
@@ -206,6 +213,8 @@ public class Triggerfish : MonoBehaviour
         movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
+
+        Debug.Log("Max Distance Chased = " + distances.Max() + "\nAverage Distance Chased = " + distances.Average());
     }
 
     /// <summary>
@@ -288,17 +297,20 @@ public class Triggerfish : MonoBehaviour
                                                          Quaternion.LookRotation(direction),
                                                          turningSpeed * Time.deltaTime);
 
-        //cretes variable for acceleration adjustments
-        float adjustment = speed * accelerationFactor * Time.deltaTime;
 
         if (state == State.Chasing)
         {
+            //cretes variable for acceleration adjustments
+            float adjustment = speed * chasingAccerleration * Time.deltaTime;
+
             //adjusts speed based on standard max speed
             if (speed < maxSpeed) { speed += adjustment; }
             else { speed -= adjustment; }
         }
         else
         {
+            float adjustment = speed * passiveAccerleration * Time.deltaTime;
+
             //sets the passive limit for maxSpeed reachable
             float passiveMax = maxSpeed * passiveLimiter;
 
