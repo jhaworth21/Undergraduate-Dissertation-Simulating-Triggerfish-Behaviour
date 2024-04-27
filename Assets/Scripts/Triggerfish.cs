@@ -42,16 +42,9 @@ public class Triggerfish : MonoBehaviour
     public float timeAdjustment = 0.5f;
     public float stateChangeThreshold = 0.5f;
     public float stateChangeWeight = 0.48f;
-    public float numTrials;
     private float baseStateChangeProbability;
     private float chaseDistAdjuster = 0.25f;
     private float chaseDistance;
-
-    private float numOfStateChange = 0f;
-    private float numPToC = 0f;
-    private float numPToP = 0f;
-    private float numCToP = 0f;
-    private float numCToC = 0f;
 
     //header for the variables relating to the territory area and movement area
     [Header("Boundaries and Territory")]
@@ -213,17 +206,6 @@ public class Triggerfish : MonoBehaviour
         movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
-
-        Debug.Log("number of State Changes = " + numOfStateChange + 
-            "\nCircling -> Circling = " +  numCToC + 
-            "\n Circling -> Patrolling = " + numCToP + 
-            "\n Patrolling -> Patrolling = " + numPToP + 
-            "\nPatrolling -> Circling = " + numPToC);
-
-        if (numOfStateChange >= numTrials)
-        {
-            Debug.Break();
-        }
     }
 
     /// <summary>
@@ -243,28 +225,7 @@ public class Triggerfish : MonoBehaviour
         //Randomly change speed on passive state change if state changes
         speed = (Random.Range(minSpeed, maxSpeed * passiveLimiter));
 
-        if ((state == State.Circling) && (newState == State.Circling))
-        {
-            numOfStateChange++;
-            numCToC++;
-        }
-        else if((state == State.Circling) && (newState == State.Patrolling))
-        {
-            numOfStateChange++;
-            numCToP++;
-        }
-        else if((state == State.Patrolling) && (newState == State.Patrolling))
-        {
-            numOfStateChange++;
-            numPToP++;
-        }
-        else if((state == State.Patrolling) && (newState == State.Circling))
-        {
-            numOfStateChange++;
-            numPToC++;
-        }
-
-            baseStateChangeProbability = Random.Range(0, 1f);
+        baseStateChangeProbability = Random.Range(0, 1f);
         timeSinceLastStateChange = 0;
 
         return newState;
