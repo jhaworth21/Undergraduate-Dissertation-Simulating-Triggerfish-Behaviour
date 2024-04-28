@@ -17,7 +17,6 @@ public class Triggerfish : MonoBehaviour
 
     //defines the possible states of the triggerfish
     private enum State { Chasing, Circling, Patrolling, Returning };
-    private List<float> testList = new List<float>();
 
     //header section for the variables relating to the current state
     [Header("State Variables")]
@@ -171,7 +170,11 @@ public class Triggerfish : MonoBehaviour
                 }
                 //updates the cureent angle based on the current speed and adjusts this to the time change
                 circlingAngle += (lastState == state) ? speed * Time.deltaTime : 0;
-                goalPos = updateCircleGoalPos(circlingAngle, circlingRadius);
+                if (Vector3.Distance(gameObject.transform.position, goalPos) < 0.5)
+                {
+                    goalPos = updateCircleGoalPos(circlingAngle, circlingRadius);
+                }
+
             }
         }
 
@@ -191,8 +194,6 @@ public class Triggerfish : MonoBehaviour
             //if not checks if the Triggerfish has chased the object a generated distance
             if (!chasedInNest)
             {
-                distances.Add(chaseDistance);
-                state = updateState();
                 if (distanceChased > chaseDistance)
                 {
                     //if so updates the state
@@ -277,9 +278,10 @@ public class Triggerfish : MonoBehaviour
     private Vector3 updateCircleGoalPos(float theta,  float radius)
     {
         //calculates the new positon based of the parametric equation of a circle
-        float xVal = nest.transform.position.x + (radius * Mathf.Cos(theta)  * Time.deltaTime);
+        Debug.Log("Radius = " + radius);
+        float xVal = nest.transform.position.x + (radius * Mathf.Cos(theta) * (Time.deltaTime * speed));
         float yVal = gameObject.transform.position.y;
-        float zVal = nest.transform.position.z + (radius * Mathf.Sin(theta)) * Time.deltaTime; 
+        float zVal = nest.transform.position.z + (radius * Mathf.Sin(theta) * (Time.deltaTime * speed)); 
 
         return new Vector3(xVal, yVal, zVal);
     }
@@ -294,7 +296,7 @@ public class Triggerfish : MonoBehaviour
         //rotates the Triggerfish object to face the goal position
         gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation,
                                                          Quaternion.LookRotation(direction),
-                                                         turningSpeed * Time.deltaTime);
+                                                         speed * Time.deltaTime);
 
 
         if (state == State.Chasing)
