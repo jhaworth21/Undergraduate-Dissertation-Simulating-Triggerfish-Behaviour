@@ -122,7 +122,6 @@ public class Triggerfish : MonoBehaviour
             currentlyChased = closest;
             //generates a distance to chase the object based on an exponential probability 
             chaseDistance = genChaseDist(chaseDistAdjuster, 1f, 30f);
-            distances.Add(chaseDistance);
         }
 
         //if state isn't in chasing (ie passive state)
@@ -192,6 +191,8 @@ public class Triggerfish : MonoBehaviour
             //if not checks if the Triggerfish has chased the object a generated distance
             if (!chasedInNest)
             {
+                distances.Add(chaseDistance);
+                state = updateState();
                 if (distanceChased > chaseDistance)
                 {
                     //if so updates the state
@@ -213,8 +214,6 @@ public class Triggerfish : MonoBehaviour
         movement();
         timeSinceLastStateChange += Time.deltaTime;
         lastState = state;
-
-        Debug.Log("Max Distance Chased = " + distances.Max() + "\nAverage Distance Chased = " + distances.Average());
     }
 
     /// <summary>
@@ -433,7 +432,7 @@ public class Triggerfish : MonoBehaviour
     ///     Uses an exponential distribution to determine how far the Triggerfish should chase an object 
     /// </summary>
     /// <param name="lambda">
-    ///     Step adjustment parameter (rate of decay for the proability
+    ///     Step adjustment parameter (rate of decay for the proability)
     /// </param>
     /// <param name="min">
     ///     The minimum distance a fish can chase something
@@ -444,13 +443,15 @@ public class Triggerfish : MonoBehaviour
     /// <returns>   
     ///     The generated distance the object should be chased based on the probability distribution
     /// </returns>
-    private float genChaseDist(float lambda, float min, float max)
+    private float genChaseDist(float rate, float min, float max)
     {
         random = new System.Random();
 
+        float lambda = 1 / rate;
+
         //generates a random value from exponential distribution
-        float randNum = (float)random.NextDouble();
-        float result = (float)(-Mathf.Log(1 - randNum) / lambda);
+        float randomNum = (float)random.NextDouble();
+        float result = (float)(-Mathf.Log(1 - randomNum) / lambda);
 
         //scales the result to fit within min and max
         result = Mathf.Clamp(result, min, max);
