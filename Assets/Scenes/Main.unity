@@ -295,6 +295,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: clown_triggerfish
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2335129444223020683, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.7601909
@@ -1186,7 +1190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &835266264
 Transform:
   m_ObjectHideFlags: 0
@@ -1196,7 +1200,7 @@ Transform:
   m_GameObject: {fileID: 835266262}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 37.39, y: -9.6, z: -11.8}
+  m_LocalPosition: {x: 66.5, y: -9.6, z: -76.4}
   m_LocalScale: {x: 5, y: 10, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1217,12 +1221,12 @@ MonoBehaviour:
   fishPrefab: {fileID: 5066407042696303028, guid: 50c2e8b77b4adf44a94b39f0a05c6bd6, type: 3}
   schoolSize: 20
   allFish: []
-  schoolLimit: {x: 10, y: 10, z: 10}
+  schoolLimit: {x: 5, y: 5, z: 5}
   goalPos: {x: 0, y: 0, z: 0}
   swimmingBounds: {fileID: 1194598745}
   minSpeed: 0.5
   maxSpeed: 2
-  neighbourDistance: 0
+  neighbourDistance: 10
   rotationSpeed: 0
   cohesionWeighting: 1
   alignmentWeighting: 1
@@ -1727,6 +1731,10 @@ PrefabInstance:
     - target: {fileID: 9096525621056466016, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
       propertyPath: m_Name
       value: Nest
+      objectReference: {fileID: 0}
+    - target: {fileID: 9096525621056466016, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9146722638050543544, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
       propertyPath: m_CastShadows
@@ -3292,7 +3300,7 @@ MonoBehaviour:
   minSpeed: 0.7
   maxSpeed: 2.83
   passiveAccerleration: 0.5
-  chasingAccerleration: 2.4
+  chasingAccerleration: 1.5
   passiveLimiter: 0.4
   viewRange: 35
   viewAngle: 360
@@ -3497,7 +3505,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1985945748
 Transform:
   m_ObjectHideFlags: 0
@@ -3711,7 +3719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalRotation.x
@@ -3719,7 +3727,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalRotation.z
@@ -3731,7 +3739,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
