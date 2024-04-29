@@ -18,6 +18,11 @@ public class SchoolManager : MonoBehaviour
     [Range(1.0f, 10.0f)] public float neighbourDistance;
     [Range(1.0f, 5.0f)] public float rotationSpeed;
 
+    [Header("Weighting Settings")]
+    public float cohesionWeighting;
+    public float alignmentWeighting;
+    public float separationWeighting;
+
     void Start()
     {
 

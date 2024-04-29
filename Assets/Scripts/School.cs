@@ -88,7 +88,7 @@ public class School : MonoBehaviour
                     if (mDistance < 1.0f)
                     {
 
-                        vAvoid = vAvoid + (this.transform.position - go.transform.position);
+                        vAvoid = vAvoid + SchoolManager.SM.separationWeighting * (this.transform.position - go.transform.position);
                     }
 
                     School anotherSchool = go.GetComponent<School>();

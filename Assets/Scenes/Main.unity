@@ -297,7 +297,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2335129444223020683, guid: fd04c2b76991fe24789bfbc35de8f1da, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1200,7 +1200,7 @@ Transform:
   m_GameObject: {fileID: 835266262}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 66.5, y: -9.6, z: -76.4}
+  m_LocalPosition: {x: 48.36, y: -9.6, z: -76.4}
   m_LocalScale: {x: 5, y: 10, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1219,18 +1219,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fishPrefab: {fileID: 5066407042696303028, guid: 50c2e8b77b4adf44a94b39f0a05c6bd6, type: 3}
-  schoolSize: 20
+  numFish: 20
   allFish: []
-  schoolLimit: {x: 5, y: 5, z: 5}
+  schoolLimits: {x: 1, y: 1, z: 1}
   goalPos: {x: 0, y: 0, z: 0}
-  swimmingBounds: {fileID: 1194598745}
   minSpeed: 0.5
   maxSpeed: 2
   neighbourDistance: 10
   rotationSpeed: 0
-  cohesionWeighting: 1
-  alignmentWeighting: 1
-  separationWeighting: 1
 --- !u!1001 &900409510
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1502,13 +1498,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25492284, y: -0.6272945, z: 0.26090348, w: 0.68807375}
-  m_LocalPosition: {x: 80.5, y: 17.3, z: -83}
+  m_LocalRotation: {x: 0.047817674, y: -0.67542064, z: 0.043967515, w: 0.73456603}
+  m_LocalPosition: {x: 65.1, y: -6.2, z: -81.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 42.698, y: -83.513, z: 3.059}
+  m_LocalEulerAnglesHint: {x: 7.449, y: -85.196, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1734,7 +1730,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9096525621056466016, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9146722638050543544, guid: a69fb83fe39586e41abdbb0803087e6d, type: 3}
       propertyPath: m_CastShadows
@@ -3303,7 +3299,7 @@ MonoBehaviour:
   chasingAccerleration: 1.5
   passiveLimiter: 0.4
   viewRange: 35
-  viewAngle: 360
+  viewAngle: 180
 --- !u!64 &1839271499
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3505,7 +3501,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1985945748
 Transform:
   m_ObjectHideFlags: 0
@@ -3715,7 +3711,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -78.86
+      value: -66.55
       objectReference: {fileID: 0}
     - target: {fileID: 97786054943766737, guid: b729e18ea786f8f40ab8153d85d7204c, type: 3}
       propertyPath: m_LocalRotation.w
