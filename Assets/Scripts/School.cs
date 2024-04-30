@@ -6,33 +6,29 @@ public class School : MonoBehaviour
 {
     float speed;
     bool turning = false;
+    List<GameObject> neighbours = new List<GameObject>();
 
     void Start()
     {
-
         speed = Random.Range(SchoolManager.SM.minSpeed, SchoolManager.SM.maxSpeed);
     }
 
 
     void Update()
     {
-
         Bounds b = new Bounds(SchoolManager.SM.transform.position, SchoolManager.SM.schoolLimits * 2.0f);
 
         if (!b.Contains(transform.position))
         {
-
             turning = true;
         }
         else
         {
-
             turning = false;
         }
 
         if (turning)
         {
-
             Vector3 direction = SchoolManager.SM.transform.position - transform.position;
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
@@ -41,11 +37,8 @@ public class School : MonoBehaviour
         }
         else
         {
-
-
             if (Random.Range(0, 100) < 10)
             {
-
                 speed = Random.Range(SchoolManager.SM.minSpeed, SchoolManager.SM.maxSpeed);
             }
 
@@ -82,7 +75,7 @@ public class School : MonoBehaviour
                 if (mDistance <= SchoolManager.SM.neighbourDistance)
                 {
 
-                    vCentre += go.transform.position;
+                    vCentre += SchoolManager.SM.cohesionWeighting * go.transform.position;
                     groupSize++;
 
                     if (mDistance < 1.0f)
@@ -100,7 +93,7 @@ public class School : MonoBehaviour
         if (groupSize > 0)
         {
 
-            vCentre = vCentre / groupSize + (SchoolManager.SM.goalPos - this.transform.position);
+            vCentre = vCentre / groupSize + SchoolManager.SM.alignmentWeighting * (SchoolManager.SM.goalPos - this.transform.position);
             speed = gSpeed / groupSize;
 
             if (speed > SchoolManager.SM.maxSpeed)
@@ -233,6 +226,61 @@ public class School : MonoBehaviour
     //                                                  Quaternion.LookRotation(direction),
     //                                                  SchoolManager.SM.rotationSpeed * Time.deltaTime);
     //    }
+    //}
+
+    private void FindNeighbours()
+    {
+        for (int i = 0; i < SchoolManager.SM.numFish; i++)
+        {
+            GameObject currentFish = SchoolManager.SM.allFish[i];
+            if (currentFish != this)
+            {
+                float currDistance = Vector3.SqrMagnitude(currentFish.transform.position - gameObject.transform.position);
+                if (currDistance <= SchoolManager.SM.neighbourDistance)
+                {
+                    neighbours.Add(currentFish);
+                }
+            }
+        }
+    }
+
+    private Vector3 separationVectorCalc()
+    {
+        Vector3 separationVector = Vector3.zero;
+        int count = 0;
+        foreach (GameObject go in neighbours)
+        {
+            separationVector += (gameObject.transform.position - go.transform.position);
+            count++;
+        }
+        if (separationVector !=  Vector3.zero)
+        {
+            separationVector /= count;
+            separationVector = separationVector.normalized;
+        }
+        return separationVector;
+    }
+
+    private Vector3 alignmentVectorCalc()
+    {
+        Vector3 alignmentVector = gameObject.transform.forward;
+        int count = 0;
+        foreach (GameObject go in neighbours)
+        {
+            alignmentVector += go.transform.forward;
+            count++;
+        }
+        if(count != 0)
+        {
+            alignmentVector /= count;
+            alignmentVector = alignmentVector.normalized;
+        }
+        return alignmentVector;
+    }
+
+    //private Vector3 boundVectorCalc()
+    //{
+
     //}
 }
 

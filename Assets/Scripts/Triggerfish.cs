@@ -109,6 +109,7 @@ public class Triggerfish : MonoBehaviour
     void Update()
     {
 
+        float currPassiveLimit = passiveLimiter;
         //gets the objects in nest and the nearest of these
         inNest = nestManager.getObjectsInNest();
         closest = getNearestObj(inNest);
@@ -129,6 +130,9 @@ public class Triggerfish : MonoBehaviour
             //resets the distance chased and currently chased - not in chasing any more
             distanceChased = 0;
             currentlyChased = null;
+
+            currPassiveLimit = (nestMeshCollider.bounds.Contains(gameObject.transform.position) 
+                && state == State.Circling) ? currPassiveLimit / 2.5f : currPassiveLimit;
 
             //checks if triggerfish is within 
             if(!patrolAreaCollider.bounds.Contains(gameObject.transform.position))
@@ -170,10 +174,7 @@ public class Triggerfish : MonoBehaviour
                 }
                 //updates the cureent angle based on the current speed and adjusts this to the time change
                 circlingAngle += (lastState == state) ? speed * Time.deltaTime : 0;
-                if (Vector3.Distance(gameObject.transform.position, goalPos) < 0.5)
-                {
-                    goalPos = updateCircleGoalPos(circlingAngle, circlingRadius);
-                }
+                goalPos = updateCircleGoalPos(circlingAngle, circlingRadius);
 
             }
         }
@@ -278,11 +279,9 @@ public class Triggerfish : MonoBehaviour
     private Vector3 updateCircleGoalPos(float theta,  float radius)
     {
         //calculates the new positon based of the parametric equation of a circle
-        Debug.Log("Radius = " + radius);
-        float xVal = nest.transform.position.x + (radius * Mathf.Cos(theta) * (Time.deltaTime * speed));
+        float xVal = nest.transform.position.x + (radius * Mathf.Cos(theta) * Time.deltaTime);
         float yVal = gameObject.transform.position.y;
-        float zVal = nest.transform.position.z + (radius * Mathf.Sin(theta) * (Time.deltaTime * speed)); 
-
+        float zVal = nest.transform.position.z + (radius * Mathf.Sin(theta) * Time.deltaTime);
         return new Vector3(xVal, yVal, zVal);
     }
 
@@ -392,7 +391,7 @@ public class Triggerfish : MonoBehaviour
     /// <returns></returns>
     private bool checkChasingPreconditions(List<GameObject> objsInTerritory, GameObject closestObj)
     {
-        if (objsInTerritory.Count != 0 && checkInVision(closestObj) && currentlyChased == null)
+        if (objsInTerritory.Count != 0 && checkInVision(closestObj))
         {
             return true;
         }
