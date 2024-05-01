@@ -31,7 +31,7 @@ public class Triggerfish : MonoBehaviour
     [SerializeField]
     private float distanceChased;
     [SerializeField]
-    private GameObject currentlyChased;
+    public GameObject currentlyChased;
     [SerializeField]
     private float circlingAngle = 0f;
     [SerializeField]
@@ -193,7 +193,8 @@ public class Triggerfish : MonoBehaviour
             bool chasedInNest = nestMeshCollider.bounds.Contains(goalPos);
 
             //if not checks if the Triggerfish has chased the object a generated distance
-            if (!chasedInNest)
+            //TODO - remove last condition after demo
+            if (!chasedInNest || timeSinceLastStateChange > 4)
             {
                 if (distanceChased > chaseDistance)
                 {
@@ -226,12 +227,11 @@ public class Triggerfish : MonoBehaviour
     /// </returns>
     private State updateState()
     {
-
         //generates a random number between 0 and 1
         float stateProbability = Random.Range(0, 1f);
 
         //changes state value depending on the value above
-        State newState = (stateProbability <= stateChangeWeight) ? State.Patrolling : State.Circling;
+        State newState = (stateProbability <= stateChangeWeight) ? State.Patrolling : State.Patrolling;
         //Randomly change speed on passive state change if state changes
         speed = (Random.Range(minSpeed, maxSpeed * passiveLimiter));
 
